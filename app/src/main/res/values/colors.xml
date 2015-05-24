@@ -19,4 +19,6 @@
     <drawable name="pressed_gray">#F0F0F0</drawable>
     <drawable name="selected_gray">#F0F0F0</drawable>
     <color name="faint_white">#F5F5F5</color>
+    <color name="bule_text_color">#1E88E5</color>
+    <color name="highLight_yello">#FFFBCC</color>
 </resources>

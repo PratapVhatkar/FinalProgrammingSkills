@@ -3,10 +3,12 @@ package programminginterviews.vhatkar.pratap.com.programmingskills;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
+import android.os.Handler;
 import android.service.carrier.CarrierMessagingService;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.text.Editable;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
@@ -15,7 +17,16 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.facebook.AccessToken;
+import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
@@ -24,6 +35,8 @@ import com.facebook.Profile;
 import com.facebook.ProfileTracker;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
+import com.gc.materialdesign.views.ButtonFlat;
+import com.gc.materialdesign.views.ButtonRectangle;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
@@ -59,7 +72,9 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 import org.apache.http.HttpResponse;
@@ -72,12 +87,17 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.support.v4.app.Fragment;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Arrays;
 import java.security.MessageDigest;
@@ -86,6 +106,8 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.Signature;
+
+import static com.android.volley.Request.*;
 
 //implements
 //ConnectionCallbacks, OnConnectionFailedListener,
@@ -138,6 +160,7 @@ public class PreLogin extends Activity implements
     private LoginButton mFbLoginButton;
     private  boolean signedIn;
     private SharedPreferences sharedPref;
+    private   AccessTokenTracker accessTokenTracker;
 
 
     @Override
@@ -145,7 +168,20 @@ public class PreLogin extends Activity implements
         FacebookSdk.sdkInitialize(getApplicationContext());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pre_login);
+        updateWithToken(AccessToken.getCurrentAccessToken());
 
+
+        ButtonFlat toRegistration = (ButtonFlat) findViewById(R.id.btnRegistration);
+        toRegistration.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                //to registration
+                Intent intent = new Intent(PreLogin.this, Registration.class);
+                startActivity(intent);
+                finish();
+            }
+        });
 
         try {
             PackageInfo info = getPackageManager().getPackageInfo(
@@ -172,9 +208,9 @@ public class PreLogin extends Activity implements
                 AccessToken accessToken = AccessToken.getCurrentAccessToken();
                 Log.e("Token", accessToken.toString());
                 signedIn = true;
-                SharedPreferences.Editor editor = sharedPref.edit();
-                editor.putBoolean("signedin", signedIn);
-                editor.apply();
+               // SharedPreferences.Editor editor = sharedPref.edit();
+               // editor.putBoolean("signedin", signedIn);
+               // editor.apply();
                 Intent intent = new Intent(PreLogin.this, MainActivity.class);
                 startActivity(intent);
                 finish();
@@ -189,18 +225,15 @@ public class PreLogin extends Activity implements
             public void onError(FacebookException exception) {
                 // App code
             }
+
+           AccessTokenTracker accessTokenTracker = new AccessTokenTracker() {
+                @Override
+                protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken newAccessToken) {
+                    updateWithToken(newAccessToken);
+                }
+            };
+
         });
-
-        ProfileTracker profileTracker = new ProfileTracker() {
-            @Override
-            protected void onCurrentProfileChanged(
-                    Profile oldProfile,
-                    Profile currentProfile) {
-                Log.e("oldProfile", oldProfile.getName());
-            }
-        };
-
-
 
 
         //Google setup
@@ -211,9 +244,95 @@ public class PreLogin extends Activity implements
         if (savedInstanceState != null) {
             mSignInProgress = savedInstanceState
                     .getInt(SAVED_PROGRESS, STATE_DEFAULT);
+            Intent intent = new Intent(PreLogin.this, MainActivity.class);
+        startActivity(intent);
+        finish();
+
         }
         mGoogleApiClient = buildGoogleApiClient();
 
+
+        ButtonRectangle userlogin = (ButtonRectangle) findViewById(R.id.userLogin);
+        userlogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+
+                final EditText useremail = (EditText)findViewById(R.id.username);
+                final EditText password = (EditText)findViewById(R.id.passwordtextfield);
+                if(isValidEmail(useremail.getText())) {
+
+
+                    StringRequest sr = new StringRequest(Request.Method.POST, "http://testmyskills.herokuapp.com/api/v1/sessions.json", new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+
+                            System.out.print(response);
+
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error)
+                        {
+                            System.out.print("Error");
+                        }
+                    })
+                    {
+                        @Override
+                        protected Map<String, String> getParams() {
+                            Map<String, String> params = new HashMap<String, String>();
+                            params.put("username", useremail.getText().toString());
+                            params.put("password", password.getText().toString());
+                            return params;
+                        }
+
+                    };
+
+                    RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+                    queue.add(sr);
+
+
+                }}
+
+
+
+        });
+
+    }
+
+
+
+
+
+
+    public final static boolean isValidEmail(CharSequence target) {
+        if (target == null) {
+            return false;
+        } else {
+            return android.util.Patterns.EMAIL_ADDRESS.matcher(target).matches();
+        }
+    }
+
+    private void updateWithToken(AccessToken currentAccessToken) {
+
+        if (currentAccessToken != null) {
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    Intent intent = new Intent(PreLogin.this, MainActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
+            }, 0);
+        } else {
+            new Handler().postDelayed(new Runnable() {
+
+                @Override
+                public void run() {
+
+                }
+            }, 0);
+        }
     }
 
     private GoogleApiClient buildGoogleApiClient() {
@@ -233,6 +352,13 @@ public class PreLogin extends Activity implements
     @Override
     public void onConnected(Bundle connectionHint) {
         Log.i(TAG, "onConnected");
+
+        Toast.makeText(this, "User is connected!", Toast.LENGTH_LONG).show();
+
+//        Intent intent = new Intent(PreLogin.this, MainActivity.class);
+//        startActivity(intent);
+//        finish();
+
         mSignInButton.setEnabled(false);
 //        Person currentUser = Plus.PeopleApi.getCurrentPerson(mGoogleApiClient);
 //        System.out.print("Person data --->" + currentUser.getObjectType());
@@ -251,12 +377,17 @@ public class PreLogin extends Activity implements
 
             String personName = currentPerson.getDisplayName();
             Log.i("personName", personName);
+
+//            Intent intent = new Intent(PreLogin.this, MainActivity.class);
+//            startActivity(intent);
+//            finish();
         }
     }
 
     @Override
     public void onResult(People.LoadPeopleResult peopleData) {
         System.out.print(" People Data --->" + peopleData.toString());
+
     }
 
 
@@ -375,6 +506,11 @@ public class PreLogin extends Activity implements
     public void onSuccess(LoginResult loginResults) {
         AccessToken.getCurrentAccessToken();
         System.out.print("Sucess...");
+
+        Intent intent = new Intent(PreLogin.this, MainActivity.class);
+        startActivity(intent);
+        finish();
+
     }
 
 

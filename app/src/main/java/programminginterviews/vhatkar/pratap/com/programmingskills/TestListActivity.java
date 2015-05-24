@@ -18,6 +18,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.gc.materialdesign.views.ProgressBarCircularIndeterminate;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -41,8 +42,8 @@ public class TestListActivity extends ActionBarActivity {
 
             // Start with mock environment.  When ready, switch to sandbox (ENVIRONMENT_SANDBOX)
             // or live (ENVIRONMENT_PRODUCTION)
-            .environment(PayPalConfiguration.ENVIRONMENT_SANDBOX)
-            .clientId("AaYAjj-dpBw68_Coke-r4AK10pPj0oe9-7RbYkAIP0tiUMecTd4iYoghqb4zAsjlXAbH3VG6L4wfHg6e");
+            .environment(PayPalConfiguration.ENVIRONMENT_PRODUCTION)
+            .clientId("AcsT1CFUhWufw4rNHkE1zFgu8-2L6IOaev82uqhLhLNgjm2t5A3trpML5wCptRpnfJ8YM5vBlgf1EzJH");
 
 
     @Override
@@ -63,7 +64,8 @@ public class TestListActivity extends ActionBarActivity {
                     public void onResponse(String response) {
 
                         System.out.println(response);
-
+                        ProgressBarCircularIndeterminate progressBar = (ProgressBarCircularIndeterminate)findViewById(R.id.progressBarCircularIndeterminate);
+                        progressBar.setVisibility(View.INVISIBLE);
                         ListView listView = (ListView) findViewById(R.id.testList);
                         CustomTestListAdapter mAdapter = new CustomTestListAdapter(TestListActivity.this, parse(response));
                         listView.setAdapter(mAdapter);
@@ -118,7 +120,7 @@ public class TestListActivity extends ActionBarActivity {
         //   - PAYMENT_INTENT_ORDER to create a payment for authorization and capture
         //     later via calls from your server.
 
-        PayPalPayment payment = new PayPalPayment(new BigDecimal("1.0"), "USD", "JAVA Test 1",
+        PayPalPayment payment = new PayPalPayment(new BigDecimal(".5"), "USD", "JAVA Test 1",
                 PayPalPayment.PAYMENT_INTENT_SALE);
 
         Intent intent = new Intent(this, PaymentActivity.class);

@@ -1,5 +1,6 @@
 package programminginterviews.vhatkar.pratap.com.programmingskills;
 
+import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
@@ -11,8 +12,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.RadioButton;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -37,11 +40,37 @@ public class QuestionActivity extends ActionBarActivity {
 
     public  HorizontialListView listview;
 
+    private QuestionModel[] modelArray;
+
+    private  QuestionAdapter mAdapter;
+
+    private int totalListCount = 0;
+
+    private boolean isFinalQuestion = false;
+
+    private ButtonFlat backBtn;
+    private ButtonFlat nextBtn;
+    private ButtonFlat endTest;
+    private ButtonFlat submitButton;
+    private QuestionModel[] resultsScreenAns;
+    public AnswerModel[] userAnsList;
+    ArrayList<Integer> serverAns = new ArrayList<Integer>();
+    ArrayList<Integer> reviewAns = new ArrayList<Integer>();
+    ArrayList<Integer> userAns = new ArrayList<Integer>();
+    private int para;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_question);
 
+        //Backbtn
+        endTest = (ButtonFlat) findViewById(R.id.btnEndtest);
+        backBtn = (ButtonFlat) findViewById(R.id.backBtn);
+        nextBtn = (ButtonFlat) findViewById(R.id.nextBtn);
+        resultsScreenAns = null;
+        userAnsList = null;
 
         listview = (HorizontialListView) findViewById(R.id.listview);
         listview.setScrollContainer(false);
@@ -49,30 +78,34 @@ public class QuestionActivity extends ActionBarActivity {
         RequestQueue queue = Volley.newRequestQueue(this);
 
         Intent intent = getIntent();
-        int para = intent.getIntExtra("test_id", 0);
-        
-        String url ="http://testmyskills.herokuapp.com/api/v1/questions.json?test_id=" + para;
+        para = intent.getIntExtra("test_id", 0);
 
+        String url = "http://testmyskills.herokuapp.com/api/v1/questions.json?test_id=" + para;
+
+        reviewAns = intent.getIntegerArrayListExtra("serverAns");
+        userAns = intent.getIntegerArrayListExtra("userAns");
+        final boolean isReview = getIntent().getExtras().getBoolean("isReview");
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         System.out.println(response);
-                        QuestionAdapter mAdapter = new QuestionAdapter(QuestionActivity.this, parse(response));
+                        mAdapter = new QuestionAdapter(QuestionActivity.this, parse(response), reviewAns, isReview, userAns);
                         listview.setAdapter(mAdapter);
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
 
-                System.out.print("Errors--->"+error.toString());
+                System.out.print("Errors--->" + error.toString());
             }
         });
 
         queue.add(stringRequest);
 
-       //Nextbtn
-       final Button nextBtn= (Button)findViewById(R.id.nextBtn);
+        //Nextbtn
+
+        nextBtn = (ButtonFlat) findViewById(R.id.nextBtn);
 
         nextBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -80,19 +113,64 @@ public class QuestionActivity extends ActionBarActivity {
 
                 listview.post(new Runnable() {
                     public void run() {
-                        int position = listview.getFirstVisiblePosition();
-                        position = position + 1;
-                        listview.setSelection(position);
-                        Toast.makeText(QuestionActivity.this, "next -> " + position, Toast.LENGTH_SHORT).show();
+
+                        if (listview.getFirstVisiblePosition() + 1 == totalListCount) {
+                            //Last position
+                            nextBtn.setVisibility(Button.GONE);
+                            backBtn.setVisibility(Button.VISIBLE);
+//                            submitButton.setVisibility(Button.VISIBLE);
+
+                        } else {
+                            nextBtn.setVisibility(Button.VISIBLE);
+                            backBtn.setVisibility(Button.VISIBLE);
+                            int position = listview.getFirstVisiblePosition();
+                            position = position + 1;
+                            listview.setSelection(position);
+                            mAdapter.notifyDataSetChanged();
+
+                        }
+
                     }
                 });
-
             }
 
         });
 
-        //Backbtn
-        final Button endTest= (Button)findViewById(R.id.btnEndtest);
+
+        //End Test
+
+
+        backBtn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+
+                listview.post(new Runnable() {
+                    public void run() {
+
+                        if (listview.getFirstVisiblePosition() == 0) {
+                            //Last position
+                            backBtn.setVisibility(Button.GONE);
+
+                        } else {
+
+                            nextBtn.setVisibility(Button.VISIBLE);
+                            int position = listview.getFirstVisiblePosition();
+                            position = position - 1;
+
+                            if (position == 0) {
+                                backBtn.setVisibility(Button.GONE);
+                            }
+
+                            listview.setSelection(position);
+                            mAdapter.notifyDataSetChanged();
+                        }
+
+//                        Toast.makeText(QuestionActivity.this, "back -> " + position  , Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+        });
+
 
         endTest.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -100,57 +178,79 @@ public class QuestionActivity extends ActionBarActivity {
                 listview.post(new Runnable() {
                     public void run() {
 
+
                         String s = "End this test ?";
                         String ss = "all the progress will be losed";
 
-                        final Dialog dialog = new Dialog(QuestionActivity.this,s,ss);
-                        dialog.show();
-                        moveTaskToBack(true);
+                        AlertDialog.Builder builder1 = new AlertDialog.Builder(QuestionActivity.this);
+                        builder1.setMessage("End this test ?");
+                        builder1.setCancelable(true);
+                        builder1.setPositiveButton("Yes",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        Intent intent = new Intent(QuestionActivity.this, Result.class);
+                                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                        intent.putExtra("userans", userAns);
+                                        intent.putExtra("serverAns", serverAns);
+                                        intent.putExtra("test_id", para);
+                                        getApplicationContext().startActivity(intent);
+                                    }
+                                });
+                        builder1.setNegativeButton("No",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        dialog.cancel();
+                                    }
+                                });
 
-                        ButtonFlat acceptButton = dialog.getButtonAccept();
-                        acceptButton.setOnClickListener(new View.OnClickListener() {
-                            public void onClick(View v) {
-
-                                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                                getApplicationContext().startActivity(intent);
-                            }
-                        });
-
-                        ButtonFlat cancelButton = dialog.getButtonCancel();
-                        cancelButton.setOnClickListener(new View.OnClickListener() {
-                            public void onClick(View v) {
-                                dialog.dismiss();
-                            }
-                        });
-
+                        AlertDialog alert11 = builder1.create();
+                        alert11.show();
                     }
                 });
             }
 
         });
 
-        //End Test
 
-        final Button backBtn= (Button)findViewById(R.id.backBtn);
 
-        backBtn.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
+        listview.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                listview.requestDisallowInterceptTouchEvent(true);
 
-                listview.post(new Runnable() {
-                    public void run() {
-                        int position = listview.getFirstVisiblePosition();
-                        position = position -1 ;
-                        listview.setSelection(position);
-                        Toast.makeText(QuestionActivity.this, "back -> " + position  , Toast.LENGTH_SHORT).show();
-                    }
-                });
+                return false;
+
             }
-
         });
-
 
 
     }
+
+    public void LastQuestionDetected(int count,int position)
+    {
+        System.out.print("This is the Last question");
+
+        if(position+1==count){
+            isFinalQuestion = true;
+
+            endTest.setText("SUBMIT TEST");
+
+        }else {
+            isFinalQuestion = false;
+        }
+
+        ButtonFlat status= (ButtonFlat)findViewById(R.id.btnQuestionStatus);
+        status.setText(" " + (position+1) + "/" + count + " ");
+        totalListCount = count;
+    }
+
+
+    public void selectedAns(ArrayList<Integer> mainList, ArrayList<Integer> ansList)
+    {
+        userAns =mainList;
+        serverAns = ansList;
+    }
+
 
     public QuestionModel[] parse(String jsonLine)
     {
@@ -186,9 +286,8 @@ public class QuestionActivity extends ActionBarActivity {
             array[i] = model;
             ansModel = null;
 
-
         }
-
+        modelArray = array;
         return array;
     }
 

@@ -1,56 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:materialdesign="http://schemas.android.com/apk/res-auto"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:paddingLeft="@dimen/activity_horizontal_margin"
-              android:paddingRight="30dp"
+              android:paddingRight="@dimen/activity_horizontal_margin"
               android:paddingTop="@dimen/activity_vertical_margin"
               android:paddingBottom="@dimen/activity_vertical_margin"
     >
-    <com.gc.materialdesign.views.ScrollView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+
+    <ScrollView
+        android:layout_width="350dp"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
         android:id="@+id/scrollview"
-        android:scrollbars="none">
+        >
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical"
             android:showDividers="middle"
             android:divider="@drawable/commonviewdivider"
+
             >
 
+            //Question
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingRight="@dimen/activity_horizontal_margin"
-                android:paddingTop="@dimen/activity_vertical_margin"
-                android:paddingBottom="@dimen/activity_vertical_margin"
-                android:text="This will be a question ? What is sdfjh ? why aslkdjlk ?"
+                android:text="This is a textview ?"
+                android:background="@color/faint_white"
                 android:id="@+id/textQuestion"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:background="@color/faint_white"
-             />
+                android:paddingLeft="15dp"
+                android:paddingRight="15dp"
+                android:paddingTop="15dp"
+                android:paddingBottom="15dp"
+                />
 
-            //option 1
+            //Option 1
+
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingRight="@dimen/activity_horizontal_margin"
-                android:paddingTop="@dimen/activity_vertical_margin"
-                android:paddingBottom="@dimen/activity_vertical_margin"
-                android:id="@+id/relative1"
                 android:background="@color/faint_white"
-
+                android:paddingLeft="15dp"
+                android:paddingRight="15dp"
+                android:paddingTop="15dp"
+                android:paddingBottom="15dp"
+                android:id="@+id/relative1"
                 >
+
                 <RadioButton
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:id="@+id/option1RadioBox"
                     android:onClick="onClickRadioButton"
                     />
@@ -59,24 +62,26 @@
                     android:layout_height="wrap_content"
                     android:id="@+id/option1Text"
                     android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:layout_gravity="center_vertical"
+                    android:text="asdahd kalsjdklasjd akljsdkajsdlka"
+                    android:layout_toRightOf="@+id/option1RadioBox"
                     />
             </RelativeLayout>
 
-            //option 2
+            //option2
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingRight="@dimen/activity_horizontal_margin"
-                android:paddingTop="@dimen/activity_vertical_margin"
-                android:paddingBottom="@dimen/activity_vertical_margin"
+                android:background="@color/faint_white"
+                android:paddingLeft="15dp"
+                android:paddingRight="15dp"
+                android:paddingTop="15dp"
+                android:paddingBottom="15dp"
                 android:id="@+id/relative2"
-                android:background="@color/faint_white">
+                >
+
                 <RadioButton
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:id="@+id/option2RadioBox"
                     android:onClick="onClickRadioButton"
                     />
@@ -85,25 +90,26 @@
                     android:layout_height="wrap_content"
                     android:id="@+id/option2Text"
                     android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:layout_gravity="center_vertical"
+                    android:text="asdahd kalsjdklasjd akljsdkajsdlka"
+                    android:layout_toRightOf="@+id/option2RadioBox"
                     />
             </RelativeLayout>
 
-            //option 3
+            //option3
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingRight="@dimen/activity_horizontal_margin"
-                android:paddingTop="@dimen/activity_vertical_margin"
-                android:paddingBottom="@dimen/activity_vertical_margin"
+                android:background="@color/faint_white"
+                android:paddingLeft="15dp"
+                android:paddingRight="15dp"
+                android:paddingTop="15dp"
+                android:paddingBottom="15dp"
                 android:id="@+id/relative3"
-                android:background="@color/faint_white">
+                >
 
                 <RadioButton
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:id="@+id/option3RadioBox"
                     android:onClick="onClickRadioButton"
                     />
@@ -112,39 +118,43 @@
                     android:layout_height="wrap_content"
                     android:id="@+id/option3Text"
                     android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:layout_gravity="center_vertical"
-                    android:visibility="gone"
+                    android:text="asdahd kalsjdklasjd akljsdkajsdlka"
+                    android:layout_toRightOf="@+id/option3RadioBox"
                     />
             </RelativeLayout>
 
-            //OPTION 4
+            //option4
+
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingRight="@dimen/activity_horizontal_margin"
-                android:paddingTop="@dimen/activity_vertical_margin"
-                android:paddingBottom="@dimen/activity_vertical_margin"
+                android:background="@color/faint_white"
+                android:paddingLeft="15dp"
+                android:paddingRight="15dp"
+                android:paddingTop="15dp"
                 android:id="@+id/relative4"
-                android:background="@color/faint_white">
+                android:paddingBottom="15dp"
+
+                >
+
                 <RadioButton
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:id="@+id/option4RadioBox"
                     android:onClick="onClickRadioButton"
-                    android:gravity="left"
                     />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/option4Text"
                     android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="ajdhasdasd"
-                    android:paddingLeft="5dp"
+                    android:text="asdahd kalsjdklasjd akljsdkajsdlka"
                     android:layout_toRightOf="@+id/option4RadioBox"
                     />
             </RelativeLayout>
+
         </LinearLayout>
-    </com.gc.materialdesign.views.ScrollView>
+
+    </ScrollView>
+
 </LinearLayout>

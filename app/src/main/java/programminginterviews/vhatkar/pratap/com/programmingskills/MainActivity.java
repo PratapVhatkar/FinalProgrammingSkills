@@ -1,6 +1,8 @@
 package programminginterviews.vhatkar.pratap.com.programmingskills;
 
+import android.content.Intent;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
@@ -18,6 +20,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.gc.materialdesign.views.ProgressBarCircularIndeterminate;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -73,15 +76,11 @@ public class MainActivity extends ActionBarActivity
                     @Override
                     public void onResponse(String response) {
 
-//                        ProgressBar progressBar = (ProgressBar)findViewById(R.id.progressBarCircularIndeterminate);
-//
-//                        progressBar.setVisibility(View.INVISIBLE);
-
+                        ProgressBarCircularIndeterminate progressBar = (ProgressBarCircularIndeterminate)findViewById(R.id.progressBarCircularIndeterminate);
+                        progressBar.setVisibility(View.INVISIBLE);
                         System.out.println(response);
-
                         ListView listView = (ListView) findViewById(R.id.listView);
-
-                       CustomAdapter mAdapter = new CustomAdapter(MainActivity.this, parse(response));
+                        CustomAdapter mAdapter = new CustomAdapter(MainActivity.this, parse(response));
                         listView.setAdapter(mAdapter);
 
                     }
@@ -111,7 +110,8 @@ public class MainActivity extends ActionBarActivity
             String str = temp.get("name").getAsString();
             int id = temp.get("id").getAsInt();
             String description = temp.get("description").getAsString();
-            TechnologiesModel model = new TechnologiesModel(str,id,description);
+            String iconname = temp.get("icon").getAsString();
+            TechnologiesModel model = new TechnologiesModel(str,id,description,iconname);
             array[i] = model;
         }
 
@@ -122,7 +122,17 @@ public class MainActivity extends ActionBarActivity
     @Override
     public void onNavigationDrawerItemSelected(int position) {
         // update the main content by replacing fragments
-        Toast.makeText(this, "Menu item selected -> " + position, Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, "Menu item selected -> " + position, Toast.LENGTH_SHORT).show();
+
+
+        if(position == 2){
+            Intent mailer = new Intent(Intent.ACTION_SEND);
+            mailer.setType("text/plain");
+            mailer.putExtra(Intent.EXTRA_EMAIL, new String[]{"name@email.com"});
+            mailer.putExtra(Intent.EXTRA_SUBJECT, "subject");
+            mailer.putExtra(Intent.EXTRA_TEXT, "bodytext");
+            startActivity(Intent.createChooser(mailer, "Send email..."));
+        }
     }
 
 

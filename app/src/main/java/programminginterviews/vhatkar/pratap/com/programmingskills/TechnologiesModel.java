@@ -10,13 +10,15 @@ public class TechnologiesModel {
     private String technologyName;
     private int technologyID;
     private String getTechnologyDescription;
+    private String iconurl;
 
 
-    public TechnologiesModel(String name,int id,String description)
+    public TechnologiesModel(String name,int id,String description,String iconname)
     {
         this.technologyName = name;
         this.technologyID = id;
         this.getTechnologyDescription = description;
+        this.iconurl = "http://testmyskills.herokuapp.com/" + iconname;
     }
 
 
@@ -30,5 +32,9 @@ public class TechnologiesModel {
 
     public String getGetTechnologyDescription(){
         return this.getTechnologyDescription;
+    }
+
+    public String getIconurl(){
+        return this.iconurl;
     }
 }
