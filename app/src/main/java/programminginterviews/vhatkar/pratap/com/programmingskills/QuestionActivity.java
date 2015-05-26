@@ -14,8 +14,11 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioButton;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -57,13 +60,70 @@ public class QuestionActivity extends ActionBarActivity {
     ArrayList<Integer> serverAns = new ArrayList<Integer>();
     ArrayList<Integer> reviewAns = new ArrayList<Integer>();
     ArrayList<Integer> userAns = new ArrayList<Integer>();
+
+    ArrayList<Integer> seriesOfAnsers = new ArrayList<Integer>();
+    ArrayList<Integer> serverCorrectans = new ArrayList<Integer>();
     private int para;
+
+
+    //New
+
+    private TextView questiontext;
+
+    private RadioButton radiobtn1;
+    private TextView option1Text;
+
+    private RadioButton radiobtn2;
+    private TextView option2Text;
+
+    private RadioButton radiobtn3;
+    private TextView option3Text;
+
+    private RadioButton radiobtn4;
+    private TextView option4Text;
+
+    QuestionModel[] qResposne;
+
+    public int currentQuestion = 0;
+
+    private ButtonFlat QuestionStatus;
+
+    private boolean isReview =false;
+    private LinearLayout rl1;
+    private LinearLayout rl2;
+    private LinearLayout rl3;
+    private LinearLayout rl4;
+
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_question);
+
+
+        //New
+
+        questiontext = (TextView)findViewById(R.id.textQuestion);
+
+        radiobtn1 = (RadioButton)findViewById(R.id.option1RadioBox);
+        option1Text = (TextView)findViewById(R.id.option1Text);
+
+        radiobtn2 = (RadioButton)findViewById(R.id.option2RadioBox);
+        option2Text = (TextView)findViewById(R.id.option2Text);
+
+        radiobtn3 = (RadioButton)findViewById(R.id.option3RadioBox);
+        option3Text = (TextView)findViewById(R.id.option3Text);
+
+        radiobtn4 = (RadioButton)findViewById(R.id.option4RadioBox);
+        option4Text = (TextView)findViewById(R.id.option4Text);
+
+        QuestionStatus = (ButtonFlat)findViewById(R.id.btnQuestionStatus);
+
+        rl1 = (LinearLayout) findViewById(R.id.relative1);
+        rl2 = (LinearLayout) findViewById(R.id.relative2);
+        rl3 = (LinearLayout) findViewById(R.id.relative3);
+        rl4 = (LinearLayout) findViewById(R.id.relative4);
 
         //Backbtn
         endTest = (ButtonFlat) findViewById(R.id.btnEndtest);
@@ -72,8 +132,8 @@ public class QuestionActivity extends ActionBarActivity {
         resultsScreenAns = null;
         userAnsList = null;
 
-        listview = (HorizontialListView) findViewById(R.id.listview);
-        listview.setScrollContainer(false);
+//        listview = (HorizontialListView) findViewById(R.id.listview);
+//        listview.setScrollContainer(false);
 
         RequestQueue queue = Volley.newRequestQueue(this);
 
@@ -83,15 +143,44 @@ public class QuestionActivity extends ActionBarActivity {
         String url = "http://testmyskills.herokuapp.com/api/v1/questions.json?test_id=" + para;
 
         reviewAns = intent.getIntegerArrayListExtra("serverAns");
-        userAns = intent.getIntegerArrayListExtra("userAns");
-        final boolean isReview = getIntent().getExtras().getBoolean("isReview");
+        userAns = intent.getIntegerArrayListExtra("userans");
+        isReview = getIntent().getExtras().getBoolean("isReview");
+
+
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         System.out.println(response);
-                        mAdapter = new QuestionAdapter(QuestionActivity.this, parse(response), reviewAns, isReview, userAns);
-                        listview.setAdapter(mAdapter);
+
+                        qResposne = parse(response);
+                        currentQuestion = 0;
+                        fillnext(0);
+
+
+
+
+
+                        for(int i=0 ; i < qResposne.length ; i++ )
+                        {
+                            seriesOfAnsers.add(i,998);
+
+                            AnswerModel[] model = qResposne[i].getAnswerModel();
+
+                            for(int j=0 ; j < 4 ; j++ )
+                            {
+                             if(model[j].isCorrectFlag())
+                                serverCorrectans.add(i,j+1);
+                            }
+
+                        }
+
+                        if(isReview == true)
+                        {
+                            reviewTestManagemanet(reviewAns.get(currentQuestion), currentQuestion);
+                            reviewTest(userAns.get(currentQuestion));
+                        }
+
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -111,27 +200,36 @@ public class QuestionActivity extends ActionBarActivity {
             public void onClick(View v) {
 
 
-                listview.post(new Runnable() {
-                    public void run() {
+//                listview.post(new Runnable() {
+//                    public void run() {
+//
+////                        if (listview.getFirstVisiblePosition() + 1 == totalListCount) {
+//                            //Last position
+//                            nextBtn.setVisibility(Button.GONE);
+//                            backBtn.setVisibility(Button.VISIBLE);
+////                            submitButton.setVisibility(Button.VISIBLE);
+//
+//                        } else {
+//                            nextBtn.setVisibility(Button.VISIBLE);
+//                            backBtn.setVisibility(Button.VISIBLE);
+//                            int position = listview.getFirstVisiblePosition();
+//                            position = position + 1;
+//                            listview.setSelection(position);
+//                            mAdapter.notifyDataSetChanged();
+//
+//                        }
+//
+//
+//
+//                    }
+//                });
 
-                        if (listview.getFirstVisiblePosition() + 1 == totalListCount) {
-                            //Last position
-                            nextBtn.setVisibility(Button.GONE);
-                            backBtn.setVisibility(Button.VISIBLE);
-//                            submitButton.setVisibility(Button.VISIBLE);
 
-                        } else {
-                            nextBtn.setVisibility(Button.VISIBLE);
-                            backBtn.setVisibility(Button.VISIBLE);
-                            int position = listview.getFirstVisiblePosition();
-                            position = position + 1;
-                            listview.setSelection(position);
-                            mAdapter.notifyDataSetChanged();
+                        currentQuestion = currentQuestion + 1;
+                        fillnext(currentQuestion);
 
-                        }
 
-                    }
-                });
+
             }
 
         });
@@ -142,31 +240,38 @@ public class QuestionActivity extends ActionBarActivity {
 
         backBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                currentQuestion = currentQuestion - 1;
 
-                listview.post(new Runnable() {
-                    public void run() {
+                fillnext(currentQuestion);
 
-                        if (listview.getFirstVisiblePosition() == 0) {
-                            //Last position
-                            backBtn.setVisibility(Button.GONE);
 
-                        } else {
+//                listview.post(new Runnable() {
+//                    public void run() {
+////
+////                        if (listview.getFirstVisiblePosition() == 0) {
+////                            //Last position
+////                            backBtn.setVisibility(Button.GONE);
+////
+////                        } else {
+////
+////                            nextBtn.setVisibility(Button.VISIBLE);
+////                            int position = listview.getFirstVisiblePosition();
+////                            position = position - 1;
+////
+////                            if (position == 0) {
+////                                backBtn.setVisibility(Button.GONE);
+////                            }
+////
+////                            listview.setSelection(position);
+////                            mAdapter.notifyDataSetChanged();
+////                        }
+//
+//
+////                        Toast.makeText(QuestionActivity.this, "back -> " + position  , Toast.LENGTH_SHORT).show();
+////                    }
+//                });
 
-                            nextBtn.setVisibility(Button.VISIBLE);
-                            int position = listview.getFirstVisiblePosition();
-                            position = position - 1;
 
-                            if (position == 0) {
-                                backBtn.setVisibility(Button.GONE);
-                            }
-
-                            listview.setSelection(position);
-                            mAdapter.notifyDataSetChanged();
-                        }
-
-//                        Toast.makeText(QuestionActivity.this, "back -> " + position  , Toast.LENGTH_SHORT).show();
-                    }
-                });
             }
 
         });
@@ -175,81 +280,168 @@ public class QuestionActivity extends ActionBarActivity {
         endTest.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 
-                listview.post(new Runnable() {
-                    public void run() {
 
+                int totalQuestions = serverCorrectans.size();
 
-                        String s = "End this test ?";
-                        String ss = "all the progress will be losed";
+                int totalCorrect = 0;
 
-                        AlertDialog.Builder builder1 = new AlertDialog.Builder(QuestionActivity.this);
-                        builder1.setMessage("End this test ?");
-                        builder1.setCancelable(true);
-                        builder1.setPositiveButton("Yes",
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        Intent intent = new Intent(QuestionActivity.this, Result.class);
-                                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                        intent.putExtra("userans", userAns);
-                                        intent.putExtra("serverAns", serverAns);
-                                        intent.putExtra("test_id", para);
-                                        getApplicationContext().startActivity(intent);
-                                    }
-                                });
-                        builder1.setNegativeButton("No",
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        dialog.cancel();
-                                    }
-                                });
-
-                        AlertDialog alert11 = builder1.create();
-                        alert11.show();
+                for(int i = 0 ;i < serverCorrectans.size() ; i++)
+                {
+                    if(serverCorrectans.get(i) == seriesOfAnsers.get(i))
+                    {
+                        totalCorrect = totalCorrect + 1;
                     }
-                });
+                }
+
+
+                final float percentage =( totalCorrect / totalQuestions) * 100;
+
+                String s = "End this test ?";
+                String ss = "all the progress will be losed";
+
+                AlertDialog.Builder builder1 = new AlertDialog.Builder(QuestionActivity.this);
+                builder1.setMessage("End this test ?");
+                builder1.setCancelable(true);
+                builder1.setPositiveButton("Yes",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                Intent intent = new Intent(QuestionActivity.this, Result.class);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                intent.putExtra("userans", seriesOfAnsers);
+                                intent.putExtra("serverAns", serverCorrectans);
+                                intent.putExtra("test_id", para);
+                                intent.putExtra("percentage",percentage);
+                                getApplicationContext().startActivity(intent);
+                            }
+                        });
+                builder1.setNegativeButton("No",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        });
+
+                AlertDialog alert11 = builder1.create();
+                alert11.show();
             }
 
         });
 
 
 
-        listview.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                listview.requestDisallowInterceptTouchEvent(true);
+//        listview.setOnTouchListener(new View.OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event) {
+//                listview.requestDisallowInterceptTouchEvent(true);
+//
+//                return false;
+//
+//            }
+//        });
 
-                return false;
+if(isReview == false) {
+    radiobtn1 = (RadioButton) findViewById(R.id.option1RadioBox);
+    radiobtn1.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
 
+            AnswerModel[] aModel = qResposne[currentQuestion].getAnswerModel();
+
+            if (aModel[0].isCorrectFlag()) {
+                Toast.makeText(QuestionActivity.this, "correct Answer!!!", Toast.LENGTH_SHORT).show();
+
+            } else {
+                Toast.makeText(QuestionActivity.this, "Wrong Answer!!!", Toast.LENGTH_SHORT).show();
             }
-        });
 
+            checkRadioBtnStatus(1, currentQuestion);
 
-    }
-
-    public void LastQuestionDetected(int count,int position)
-    {
-        System.out.print("This is the Last question");
-
-        if(position+1==count){
-            isFinalQuestion = true;
-
-            endTest.setText("SUBMIT TEST");
-
-        }else {
-            isFinalQuestion = false;
         }
+    });
 
-        ButtonFlat status= (ButtonFlat)findViewById(R.id.btnQuestionStatus);
-        status.setText(" " + (position+1) + "/" + count + " ");
-        totalListCount = count;
+    radiobtn2 = (RadioButton) findViewById(R.id.option2RadioBox);
+    radiobtn2.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+
+            AnswerModel[] aModel = qResposne[currentQuestion].getAnswerModel();
+
+            if (aModel[1].isCorrectFlag()) {
+                Toast.makeText(QuestionActivity.this, "correct Answer!!!", Toast.LENGTH_SHORT).show();
+
+            } else {
+                Toast.makeText(QuestionActivity.this, "Wrong Answer!!!", Toast.LENGTH_SHORT).show();
+            }
+
+            checkRadioBtnStatus(2, currentQuestion);
+        }
+    });
+
+    radiobtn3 = (RadioButton) findViewById(R.id.option3RadioBox);
+    radiobtn3.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+
+            AnswerModel[] aModel = qResposne[currentQuestion].getAnswerModel();
+
+            if (aModel[2].isCorrectFlag()) {
+                Toast.makeText(QuestionActivity.this, "correct Answer!!!", Toast.LENGTH_SHORT).show();
+
+            } else {
+                Toast.makeText(QuestionActivity.this, "Wrong Answer!!!", Toast.LENGTH_SHORT).show();
+            }
+
+            checkRadioBtnStatus(3, currentQuestion);
+        }
+    });
+
+
+    radiobtn4 = (RadioButton) findViewById(R.id.option4RadioBox);
+    radiobtn4.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+
+            AnswerModel[] aModel = qResposne[currentQuestion].getAnswerModel();
+
+            if (aModel[3].isCorrectFlag()) {
+                Toast.makeText(QuestionActivity.this, "correct Answer!!!", Toast.LENGTH_SHORT).show();
+
+            } else {
+                Toast.makeText(QuestionActivity.this, "Wrong Answer!!!", Toast.LENGTH_SHORT).show();
+            }
+            checkRadioBtnStatus(4, currentQuestion);
+
+        }
+    });
+}
+
+
     }
 
+//    public void LastQuestionDetected(int count,int position)
+//    {
+//        System.out.print("This is the Last question");
+//
+//        if(position+1==count){
+//            isFinalQuestion = true;
+//
+//            endTest.setText("SUBMIT TEST");
+//
+//        }else {
+//            isFinalQuestion = false;
+//        }
+//
+//        ButtonFlat status= (ButtonFlat)findViewById(R.id.btnQuestionStatus);
+//        status.setText(" " + (position+1) + "/" + count + " ");
+//        totalListCount = count;
+//    }
 
-    public void selectedAns(ArrayList<Integer> mainList, ArrayList<Integer> ansList)
-    {
-        userAns =mainList;
-        serverAns = ansList;
-    }
+
+//    public void selectedAns(ArrayList<Integer> mainList, ArrayList<Integer> ansList)
+//    {
+//        userAns =mainList;
+//        serverAns = ansList;
+//    }
 
 
     public QuestionModel[] parse(String jsonLine)
@@ -315,5 +507,187 @@ public class QuestionActivity extends ActionBarActivity {
     }
 
 
+    public void fillnext(int position)
+    {
+
+        radiobtn1.setChecked(false);
+        radiobtn2.setChecked(false);
+        radiobtn3.setChecked(false);
+        radiobtn4.setChecked(false);
+        if(isReview == true)
+        {
+            reviewTestManagemanet(reviewAns.get(position), position);
+            reviewTest(userAns.get(position));
+        }
+
+       if(position < qResposne.length && position >= 0 )
+        if(qResposne !=null) {
+
+            QuestionStatus.setText(" " + (position+1) +"/" + qResposne.length);
+
+            questiontext.setText(qResposne[position].getQuestionText());
+            AnswerModel[] answerModel = qResposne[position].getAnswerModel();
+            option1Text.setText(answerModel[0].getAnsText());
+            option2Text.setText(answerModel[1].getAnsText());
+            option3Text.setText(answerModel[2].getAnsText());
+            option4Text.setText(answerModel[3].getAnsText());
+
+            if(position == 0)
+            {
+                backBtn.setVisibility(Button.GONE);
+            }else
+            {
+                backBtn.setVisibility(Button.VISIBLE);
+            }
+
+            if(position+1 == qResposne.length)
+            {
+                nextBtn.setVisibility(Button.GONE);
+                endTest.setText("SUBMIT TEST");
+            }
+            else
+            {
+                nextBtn.setVisibility(Button.VISIBLE);
+                endTest.setText("END TEST");
+            }
+
+
+
+
+        }
+    }
+
+    public void checkRadioBtnStatus(int pos, int index)
+    {
+
+        if(pos==1){
+            radiobtn1.setChecked(true);
+            radiobtn2.setChecked(false);
+            radiobtn3.setChecked(false);
+            radiobtn4.setChecked(false);
+            try {
+
+                seriesOfAnsers.set(index, 1);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }else if(pos == 2)
+        {
+            radiobtn1.setChecked(false);
+            radiobtn2.setChecked(true);
+            radiobtn3.setChecked(false);
+            radiobtn4.setChecked(false);
+            try {
+
+                seriesOfAnsers.set(index, 2);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }else if(pos == 3){
+            radiobtn1.setChecked(false);
+            radiobtn2.setChecked(false);
+            radiobtn3.setChecked(true);
+            radiobtn4.setChecked(false);
+            try {
+
+                seriesOfAnsers.set(index, 3);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }else if(pos==4)
+        {   radiobtn1.setChecked(false);
+            radiobtn2.setChecked(false);
+            radiobtn3.setChecked(false);
+            radiobtn4.setChecked(true);
+            try {
+
+                seriesOfAnsers.set(index, 4);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+
+    }
+
+    public void reviewTestManagemanet(int pos, int index)
+    {
+        if(pos==1)
+        {
+            rl1.setBackgroundColor(this.getResources().getColor(R.color.highLight_yello));
+            rl2.setBackgroundColor(this.getResources().getColor(R.color.faint_white));
+            rl3.setBackgroundColor(this.getResources().getColor(R.color.faint_white));
+            rl4.setBackgroundColor(this.getResources().getColor(R.color.faint_white));
+        }
+        else if(pos==2)
+        {
+            rl2.setBackgroundColor(this.getResources().getColor(R.color.highLight_yello));
+            rl1.setBackgroundColor(this.getResources().getColor(R.color.faint_white));
+
+            rl3.setBackgroundColor(this.getResources().getColor(R.color.faint_white));
+            rl4.setBackgroundColor(this.getResources().getColor(R.color.faint_white));
+        }
+        else if(pos==3)
+        {
+            rl3.setBackgroundColor(this.getResources().getColor(R.color.highLight_yello));
+            rl1.setBackgroundColor(this.getResources().getColor(R.color.faint_white));
+            rl2.setBackgroundColor(this.getResources().getColor(R.color.faint_white));
+
+            rl4.setBackgroundColor(this.getResources().getColor(R.color.faint_white));
+        }
+        else if(pos==4)
+        {
+            rl4.setBackgroundColor(this.getResources().getColor(R.color.highLight_yello));
+            rl1.setBackgroundColor(this.getResources().getColor(R.color.faint_white));
+            rl2.setBackgroundColor(this.getResources().getColor(R.color.faint_white));
+            rl3.setBackgroundColor(this.getResources().getColor(R.color.faint_white));
+
+        }
+        else {
+
+            rl1.setBackgroundColor(this.getResources().getColor(R.color.faint_white));
+            rl2.setBackgroundColor(this.getResources().getColor(R.color.faint_white));
+            rl3.setBackgroundColor(this.getResources().getColor(R.color.faint_white));
+            rl4.setBackgroundColor(this.getResources().getColor(R.color.faint_white));
+
+        }
+    }
+
+
+    public void reviewTest(int position)
+    {
+        radiobtn1.setChecked(false);
+        radiobtn2.setChecked(false);
+        radiobtn3.setChecked(false);
+        radiobtn4.setChecked(false);
+
+
+        System.out.print("checkbox " + position);
+
+        Toast.makeText(this, "checkbox -> " + position, Toast.LENGTH_SHORT).show();
+
+        if(position == 1)
+        {
+            radiobtn1.setChecked(true);
+            radiobtn1.setSelected(true);
+        }
+        else if(position == 2)
+        {
+            radiobtn2.setChecked(true);
+            radiobtn2.setSelected(true);
+        }
+        else if(position == 3)
+        {
+            radiobtn3.setChecked(true);
+            radiobtn3.setSelected(true);
+
+        }else if(position == 4)
+        {
+            radiobtn4.setChecked(true);
+            radiobtn4.setSelected(true);
+        }
+
+
+    }
 
 }

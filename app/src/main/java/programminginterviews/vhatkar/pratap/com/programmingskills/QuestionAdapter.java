@@ -199,9 +199,9 @@ public class QuestionAdapter extends BaseAdapter {
             );
 
 
-            ((QuestionActivity)appContext).
-
-            LastQuestionDetected(this.mainList.length, position);
+//            ((QuestionActivity)appContext).
+//
+//            LastQuestionDetected(this.mainList.length, position);
 
             if(isReviewTest==true)
 
@@ -292,7 +292,7 @@ public class QuestionAdapter extends BaseAdapter {
                 }
 
 
-                ((QuestionActivity) appContext).selectedAns(userAns, serverAns);
+//                ((QuestionActivity) appContext).selectedAns(userAns, serverAns);
 
             }
 

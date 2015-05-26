@@ -100,7 +100,9 @@ public class TestListActivity extends ActionBarActivity {
             JsonObject temp = jarray.get(i).getAsJsonObject();
             String testName = temp.get("name").getAsString();
             int test_id = temp.get("id").getAsInt();
-            int user_id = temp.get("user_id").getAsInt();
+
+
+            int user_id = 0;//temp.get("user_id").getAsInt();
             boolean isPaid = temp.get("is_paid").getAsBoolean();
             String price = temp.get("price").getAsString();
             int techId = temp.get("technology_id").getAsInt();

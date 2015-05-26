@@ -1,5 +1,4 @@
 package programminginterviews.vhatkar.pratap.com.programmingskills;
-
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
@@ -16,7 +15,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -54,7 +52,6 @@ import com.google.android.gms.plus.People.LoadPeopleResult;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
 import com.google.android.gms.plus.model.people.PersonBuffer;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -89,7 +86,6 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import android.support.v4.app.Fragment;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -106,47 +102,31 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.Signature;
-
 import static com.android.volley.Request.*;
-
 //implements
 //ConnectionCallbacks, OnConnectionFailedListener,
-//        ResultCallback<LoadPeopleResult>, View.OnClickListener,
-//        CheckBox.OnCheckedChangeListener, GoogleApiClient.ServerAuthCodeCallback
-
+// ResultCallback<LoadPeopleResult>, View.OnClickListener,
+// CheckBox.OnCheckedChangeListener, GoogleApiClient.ServerAuthCodeCallback
 //public class PreLogin extends ActionBarActivity i
-
-
 public class PreLogin extends Activity implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
         ResultCallback<People.LoadPeopleResult>, View.OnClickListener,
         CheckBox.OnCheckedChangeListener, GoogleApiClient.ServerAuthCodeCallbacks,fbFragment.OnFragmentInteractionListener, FacebookCallback<LoginResult> {
-
-
     private static final String TAG = "android-plus-quickstart";
     private static final int STATE_DEFAULT = 0;
     private static final int STATE_SIGN_IN = 1;
     private static final int STATE_IN_PROGRESS = 2;
     private static final int RC_SIGN_IN = 0;
     private static final String SAVED_PROGRESS = "sign_in_progress";
-
     private static final String WEB_CLIENT_ID = "1000424538924-1gru0kpmc9sdi0vt43g9ma1doqdmvcl1.apps.googleusercontent.com";
-
     private static final String SERVER_BASE_URL = "SERVER_BASE_URL";
-
     private static final String EXCHANGE_TOKEN_URL = SERVER_BASE_URL + "/exchangetoken";
-
     private static final String SELECT_SCOPES_URL = SERVER_BASE_URL + "/selectscopes";
-
     private GoogleApiClient mGoogleApiClient;
     private int mSignInProgress;
-
     private PendingIntent mSignInIntent;
-
     private int mSignInError;
-
     private boolean mRequestServerAuthCode = false;
-
     private boolean mServerHasToken = true;
     private SignInButton mSignInButton;
     private Button mSignOutButton;
@@ -155,34 +135,27 @@ public class PreLogin extends Activity implements
     private ListView mCirclesListView;
     private ArrayAdapter<String> mCirclesAdapter;
     private ArrayList<String> mCirclesList;
-
     private CallbackManager callbackManager;
     private LoginButton mFbLoginButton;
-    private  boolean signedIn;
+    private boolean signedIn;
     private SharedPreferences sharedPref;
-    private   AccessTokenTracker accessTokenTracker;
-
-
+    private AccessTokenTracker accessTokenTracker;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         FacebookSdk.sdkInitialize(getApplicationContext());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pre_login);
         updateWithToken(AccessToken.getCurrentAccessToken());
-
-
         ButtonFlat toRegistration = (ButtonFlat) findViewById(R.id.btnRegistration);
         toRegistration.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                //to registration
+//to registration
                 Intent intent = new Intent(PreLogin.this, Registration.class);
                 startActivity(intent);
                 finish();
             }
         });
-
         try {
             PackageInfo info = getPackageManager().getPackageInfo(
                     "programminginterviews.vhatkar.pratap.com.programmingskills",
@@ -193,82 +166,63 @@ public class PreLogin extends Activity implements
                 Log.d("KeyHash:", Base64.encodeToString(md.digest(), Base64.DEFAULT));
             }
         } catch (NameNotFoundException e) {
-
         } catch (NoSuchAlgorithmException e) {
-
         }
-
         LoginButton loginButton = (LoginButton) findViewById(R.id.login_button);
         loginButton.setReadPermissions("user_friends");
         callbackManager = CallbackManager.Factory.create();
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
-                // App code
+// App code
                 AccessToken accessToken = AccessToken.getCurrentAccessToken();
                 Log.e("Token", accessToken.toString());
                 signedIn = true;
-               // SharedPreferences.Editor editor = sharedPref.edit();
-               // editor.putBoolean("signedin", signedIn);
-               // editor.apply();
+// SharedPreferences.Editor editor = sharedPref.edit();
+// editor.putBoolean("signedin", signedIn);
+// editor.apply();
                 Intent intent = new Intent(PreLogin.this, MainActivity.class);
                 startActivity(intent);
                 finish();
             }
-
             @Override
             public void onCancel() {
-                // App code
+// App code
             }
-
             @Override
             public void onError(FacebookException exception) {
-                // App code
+// App code
             }
-
-           AccessTokenTracker accessTokenTracker = new AccessTokenTracker() {
+            AccessTokenTracker accessTokenTracker = new AccessTokenTracker() {
                 @Override
                 protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken newAccessToken) {
                     updateWithToken(newAccessToken);
                 }
             };
-
         });
-
-
-        //Google setup
-
+//Google setup
         mSignInButton = (SignInButton) findViewById(R.id.sign_in_button);
-        // Button listeners
+// Button listeners
         mSignInButton.setOnClickListener(this);
         if (savedInstanceState != null) {
             mSignInProgress = savedInstanceState
                     .getInt(SAVED_PROGRESS, STATE_DEFAULT);
             Intent intent = new Intent(PreLogin.this, MainActivity.class);
-        startActivity(intent);
-        finish();
-
+            startActivity(intent);
+            finish();
         }
         mGoogleApiClient = buildGoogleApiClient();
-
-
         ButtonRectangle userlogin = (ButtonRectangle) findViewById(R.id.userLogin);
         userlogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-
                 final EditText useremail = (EditText)findViewById(R.id.username);
                 final EditText password = (EditText)findViewById(R.id.passwordtextfield);
                 if(isValidEmail(useremail.getText())) {
-
-
                     StringRequest sr = new StringRequest(Request.Method.POST, "http://testmyskills.herokuapp.com/api/v1/sessions.json", new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
-
                             System.out.print(response);
-
                         }
                     }, new Response.ErrorListener() {
                         @Override
@@ -285,26 +239,12 @@ public class PreLogin extends Activity implements
                             params.put("password", password.getText().toString());
                             return params;
                         }
-
                     };
-
                     RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
                     queue.add(sr);
-
-
                 }}
-
-
-
         });
-
     }
-
-
-
-
-
-
     public final static boolean isValidEmail(CharSequence target) {
         if (target == null) {
             return false;
@@ -312,9 +252,7 @@ public class PreLogin extends Activity implements
             return android.util.Patterns.EMAIL_ADDRESS.matcher(target).matches();
         }
     }
-
     private void updateWithToken(AccessToken currentAccessToken) {
-
         if (currentAccessToken != null) {
             new Handler().postDelayed(new Runnable() {
                 @Override
@@ -326,15 +264,12 @@ public class PreLogin extends Activity implements
             }, 0);
         } else {
             new Handler().postDelayed(new Runnable() {
-
                 @Override
                 public void run() {
-
                 }
             }, 0);
         }
     }
-
     private GoogleApiClient buildGoogleApiClient() {
         GoogleApiClient.Builder builder = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
@@ -347,80 +282,58 @@ public class PreLogin extends Activity implements
         }
         return builder.build();
     }
-
-
     @Override
     public void onConnected(Bundle connectionHint) {
         Log.i(TAG, "onConnected");
-
         Toast.makeText(this, "User is connected!", Toast.LENGTH_LONG).show();
-
-//        Intent intent = new Intent(PreLogin.this, MainActivity.class);
-//        startActivity(intent);
-//        finish();
-
+// Intent intent = new Intent(PreLogin.this, MainActivity.class);
+// startActivity(intent);
+// finish();
         mSignInButton.setEnabled(false);
-//        Person currentUser = Plus.PeopleApi.getCurrentPerson(mGoogleApiClient);
-//        System.out.print("Person data --->" + currentUser.getObjectType());
-////        System.out.print("Name -->"+ currentUser.getName() + "  " + currentUser.getDisplayName() );
-//     //   Toast.makeText(PreLogin.this, "Welcome " + currentUser.getName(), Toast.LENGTH_LONG).show();
-//        Plus.PeopleApi.loadVisible(mGoogleApiClient, null)
-//                .setResultCallback(this);
+// Person currentUser = Plus.PeopleApi.getCurrentPerson(mGoogleApiClient);
+// System.out.print("Person data --->" + currentUser.getObjectType());
+//// System.out.print("Name -->"+ currentUser.getName() + " " + currentUser.getDisplayName() );
+// // Toast.makeText(PreLogin.this, "Welcome " + currentUser.getName(), Toast.LENGTH_LONG).show();
+// Plus.PeopleApi.loadVisible(mGoogleApiClient, null)
+// .setResultCallback(this);
         mSignInProgress = STATE_DEFAULT;
-
         Plus.PeopleApi.loadVisible(mGoogleApiClient, null).setResultCallback(this);
-
-        // After that  fetch data
+// After that fetch data
         if (Plus.PeopleApi.getCurrentPerson(mGoogleApiClient) != null) {
             Person currentPerson = Plus.PeopleApi
                     .getCurrentPerson(mGoogleApiClient);
-
             String personName = currentPerson.getDisplayName();
             Log.i("personName", personName);
-
-//            Intent intent = new Intent(PreLogin.this, MainActivity.class);
-//            startActivity(intent);
-//            finish();
+// Intent intent = new Intent(PreLogin.this, MainActivity.class);
+// startActivity(intent);
+// finish();
         }
     }
-
     @Override
     public void onResult(People.LoadPeopleResult peopleData) {
         System.out.print(" People Data --->" + peopleData.toString());
-
     }
-
-
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
+// Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_pre_login, menu);
         return true;
     }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+// Handle action bar item clicks here. The action bar will
+// automatically handle clicks on the Home/Up button, so long
+// as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
+//noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
-
-
-
     @Override
     public void onConnectionSuspended(int i) {
         mGoogleApiClient.connect();
-
     }
-
-
     @Override
     public void onConnectionFailed(ConnectionResult result) {
         Log.i(TAG, "onConnectionFailed: ConnectionResult.getErrorCode() = "
@@ -453,8 +366,6 @@ public class PreLogin extends Activity implements
             createErrorDialog().show();
         }
     }
-
-
     public Dialog createErrorDialog() {
         if (GooglePlayServicesUtil.isUserRecoverableError(mSignInError)) {
             return GooglePlayServicesUtil.getErrorDialog(
@@ -479,17 +390,14 @@ public class PreLogin extends Activity implements
                                     Log.e(TAG, "Google Play services error could not be "
                                             + "resolved: " + mSignInError);
                                     mSignInProgress = STATE_DEFAULT;
-//                                    mStatus.setText(R.string.status_signed_out);
+// mStatus.setText(R.string.status_signed_out);
                                 }
                             }).create();
         }
     }
-
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
     }
-
     @Override
     public void onClick(View v) {
         if (!mGoogleApiClient.isConnecting())
@@ -501,58 +409,51 @@ public class PreLogin extends Activity implements
             }
         }
     }
-
     @Override
     public void onSuccess(LoginResult loginResults) {
         AccessToken.getCurrentAccessToken();
         System.out.print("Sucess...");
-
         Intent intent = new Intent(PreLogin.this, MainActivity.class);
         startActivity(intent);
         finish();
-
     }
-
-
     protected void onActivityResult(int requestCode, int resultCode,
                                     Intent data) {
         switch (requestCode) {
             case RC_SIGN_IN:
                 if (resultCode == RESULT_OK) {
-                    // If the error resolution was successful we should continue
-                    // processing errors.
+// If the error resolution was successful we should continue
+// processing errors.
                     mSignInProgress = STATE_SIGN_IN;
                 } else {
-                    // If the error resolution was not successful or the user canceled,
-                    // we should stop processing errors.
+// If the error resolution was not successful or the user canceled,
+// we should stop processing errors.
                     mSignInProgress = STATE_DEFAULT;
                 }
                 if (!mGoogleApiClient.isConnecting()) {
-                    // If Google Play services resolved the issue with a dialog then
-                    // onStart is not called so we need to re-attempt connection here.
+// If Google Play services resolved the issue with a dialog then
+// onStart is not called so we need to re-attempt connection here.
                     mGoogleApiClient.connect();
                 }
                 break;
         }
         super.onActivityResult(requestCode, resultCode, data);
-        //manage login result
+//manage login result
         callbackManager.onActivityResult(requestCode, resultCode, data);
     }
-
-
     @Override
     public CheckResult onCheckServerAuthorization(String idToken, Set<Scope> scopeSet) {
         Log.i(TAG, "Checking if server is authorized.");
         Log.i(TAG, "Mocking server has refresh token: " + String.valueOf(mServerHasToken));
         if (!mServerHasToken) {
-            // Server does not have a valid refresh token, so request a new
-            // auth code which can be exchanged for one.  This will cause the user to see the
-            // consent dialog and be prompted to grant offline access. This callback occurs on a
-            // background thread so it is OK to do synchronous network access.
-            // Ask the server which scopes it would like to have for offline access.  This
-            // can be distinct from the scopes granted to the client.  By getting these values
-            // from the server, you can change your server's permissions without needing to
-            // recompile the client application.
+// Server does not have a valid refresh token, so request a new
+// auth code which can be exchanged for one. This will cause the user to see the
+// consent dialog and be prompted to grant offline access. This callback occurs on a
+// background thread so it is OK to do synchronous network access.
+// Ask the server which scopes it would like to have for offline access. This
+// can be distinct from the scopes granted to the client. By getting these values
+// from the server, you can change your server's permissions without needing to
+// recompile the client application.
             HttpClient httpClient = new DefaultHttpClient();
             HttpGet httpGet = new HttpGet(SELECT_SCOPES_URL);
             HashSet<Scope> serverScopeSet = new HashSet<Scope>();
@@ -574,25 +475,25 @@ public class PreLogin extends Activity implements
             } catch (IOException e) {
                 Log.e(TAG, "Error in getting server scopes.", e);
             }
-            // This tells GoogleApiClient that the server needs a new serverAuthCode with
-            // access to the scopes in serverScopeSet.  Note that we are not asking the server
-            // if it already has such a token because this is a sample application.  In reality,
-            // you should only do this on the first user sign-in or if the server loses or deletes
-            // the refresh token.
+// This tells GoogleApiClient that the server needs a new serverAuthCode with
+// access to the scopes in serverScopeSet. Note that we are not asking the server
+// if it already has such a token because this is a sample application. In reality,
+// you should only do this on the first user sign-in or if the server loses or deletes
+// the refresh token.
             return CheckResult.newAuthRequiredResult(serverScopeSet);
         } else {
-            // Server already has a valid refresh token with the correct scopes, no need to
-            // ask the user for offline access again.
+// Server already has a valid refresh token with the correct scopes, no need to
+// ask the user for offline access again.
             return CheckResult.newAuthNotRequiredResult();
         }
     }
     @Override
     public boolean onUploadServerAuthCode(String idToken, String serverAuthCode) {
-        // Upload the serverAuthCode to the server, which will attempt to exchange it for
-        // a refresh token.  This callback occurs on a background thread, so it is OK
-        // to perform synchronous network access.  Returning 'false' will fail the
-        // GoogleApiClient.connect() call so if you would like the client to ignore
-        // server failures, always return true.
+// Upload the serverAuthCode to the server, which will attempt to exchange it for
+// a refresh token. This callback occurs on a background thread, so it is OK
+// to perform synchronous network access. Returning 'false' will fail the
+// GoogleApiClient.connect() call so if you would like the client to ignore
+// server failures, always return true.
         HttpClient httpClient = new DefaultHttpClient();
         HttpPost httpPost = new HttpPost(EXCHANGE_TOKEN_URL);
         try {
@@ -604,7 +505,7 @@ public class PreLogin extends Activity implements
             final String responseBody = EntityUtils.toString(response.getEntity());
             Log.i(TAG, "Code: " + statusCode);
             Log.i(TAG, "Resp: " + responseBody);
-            // Show Toast on UI Thread
+// Show Toast on UI Thread
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -621,8 +522,8 @@ public class PreLogin extends Activity implements
         }
     }
     private void checkServerAuthConfiguration() {
-        // Check that the server URL is configured before allowing this box to
-        // be unchecked
+// Check that the server URL is configured before allowing this box to
+// be unchecked
         if ("WEB_CLIENT_ID".equals(WEB_CLIENT_ID) ||
                 "SERVER_BASE_URL".equals(SERVER_BASE_URL)) {
             Log.w(TAG, "WEB_CLIENT_ID or SERVER_BASE_URL configured incorrectly.");
@@ -638,20 +539,13 @@ public class PreLogin extends Activity implements
             dialog.show();
         }
     }
-
     @Override
     public void onCancel() {
-
     }
-
     @Override
     public void onError(FacebookException e) {
-
     }
-
     @Override
     public void onFragmentInteraction(Uri uri) {
-
     }
-
 }

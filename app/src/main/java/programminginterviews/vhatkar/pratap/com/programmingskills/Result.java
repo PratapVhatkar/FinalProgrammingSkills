@@ -21,6 +21,7 @@ public class Result extends ActionBarActivity {
     ArrayList<Integer> userAns = new ArrayList<Integer>();
 
     private  int testid;
+    TextView textStatus;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,9 +35,13 @@ public class Result extends ActionBarActivity {
         serverAns = intent.getIntegerArrayListExtra("serverAns");
         testid =  intent.getIntExtra("test_id", 0);
 
+        int percen = intent.getIntExtra("percentage",0);
 
         TextView score = (TextView)findViewById(R.id.percentageLabel);
         score.setText(calculateResult(userAns,serverAns)+"%");
+
+
+
 
 
 
@@ -49,7 +54,7 @@ public class Result extends ActionBarActivity {
                 Intent intent = new Intent(getApplicationContext(), QuestionActivity.class);
                 intent.putExtra("test_id",testid);
                 intent.putExtra("serverAns",serverAns);
-                intent.putExtra("userAns",userAns);
+                intent.putExtra("userans",userAns);
                 intent.putExtra("isReview",true);
                 startActivity(intent);
             }
@@ -72,10 +77,12 @@ public class Result extends ActionBarActivity {
             }
         }
 
+        textStatus = (TextView)findViewById(R.id.ansTextStatus);
+        textStatus.setText(totalCorrect +" are correct out of "+ totalQuestions);
 
-        int percentage = totalCorrect / totalQuestions * 100;
+        int x = (int)(((double)totalCorrect/(double)totalQuestions) * 100);
 
-        return 0;
+        return x;
     }
 
     @Override
