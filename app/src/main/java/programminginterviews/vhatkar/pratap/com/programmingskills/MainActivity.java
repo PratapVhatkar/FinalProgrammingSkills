@@ -1,9 +1,11 @@
 package programminginterviews.vhatkar.pratap.com.programmingskills;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
@@ -21,6 +23,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.gc.materialdesign.views.ProgressBarCircularIndeterminate;
+import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -64,11 +67,13 @@ public class MainActivity extends ActionBarActivity
         // Set up the drawer.
         mNavigationDrawerFragment.setup(R.id.fragment_drawer, (DrawerLayout) findViewById(R.id.drawer), mToolbar);
 
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        String restoredAuth = prefs.getString("auth", null);
+        String restoredEmail = prefs.getString("email",null);
 
         //fill the listview
         RequestQueue queue = Volley.newRequestQueue(this);
-        String url ="http://testmyskills.herokuapp.com/api/v1/technologies.json";
-
+        String url ="http://testmyskills.herokuapp.com/api/v1/technologies.json?"+"auth_token=" + restoredAuth+"&"+ "email="+restoredEmail;
 
 
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
@@ -124,6 +129,13 @@ public class MainActivity extends ActionBarActivity
         // update the main content by replacing fragments
 //        Toast.makeText(this, "Menu item selected -> " + position, Toast.LENGTH_SHORT).show();
 
+
+        if(position==1)
+        {
+            Intent intent = new Intent(MainActivity.this, TestHistory.class);
+            startActivity(intent);
+            finish();
+        }
 
         if(position == 2){
             Intent mailer = new Intent(Intent.ACTION_SEND);

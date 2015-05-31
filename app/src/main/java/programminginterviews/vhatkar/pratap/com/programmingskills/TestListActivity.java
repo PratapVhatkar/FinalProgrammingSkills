@@ -2,6 +2,8 @@ package programminginterviews.vhatkar.pratap.com.programmingskills;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,6 +20,8 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.anjlab.android.iab.v3.BillingProcessor;
+import com.anjlab.android.iab.v3.TransactionDetails;
 import com.gc.materialdesign.views.ProgressBarCircularIndeterminate;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -35,16 +39,18 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 
 
-public class TestListActivity extends ActionBarActivity {
+public class TestListActivity extends Activity implements BillingProcessor.IBillingHandler {
 
-    //paypal setup
-    private static PayPalConfiguration config = new PayPalConfiguration()
+//    //paypal setup
+//    private static PayPalConfiguration config = new PayPalConfiguration()
+//
+//            // Start with mock environment.  When ready, switch to sandbox (ENVIRONMENT_SANDBOX)
+//            // or live (ENVIRONMENT_PRODUCTION)
+//            .environment(PayPalConfiguration.ENVIRONMENT_PRODUCTION)
+//            .clientId("AcsT1CFUhWufw4rNHkE1zFgu8-2L6IOaev82uqhLhLNgjm2t5A3trpML5wCptRpnfJ8YM5vBlgf1EzJH");
 
-            // Start with mock environment.  When ready, switch to sandbox (ENVIRONMENT_SANDBOX)
-            // or live (ENVIRONMENT_PRODUCTION)
-            .environment(PayPalConfiguration.ENVIRONMENT_PRODUCTION)
-            .clientId("AcsT1CFUhWufw4rNHkE1zFgu8-2L6IOaev82uqhLhLNgjm2t5A3trpML5wCptRpnfJ8YM5vBlgf1EzJH");
 
+    private BillingProcessor bp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,11 +58,18 @@ public class TestListActivity extends ActionBarActivity {
         setContentView(R.layout.activity_test_list);
 
 
+        bp = new BillingProcessor(TestListActivity.this, getString(R.string.in_app_billing_key)  ,TestListActivity.this);
+
         Intent intent = getIntent();
-        int para = intent.getIntExtra("techid",0);
+        int para = intent.getIntExtra("techid", 0);
 
         RequestQueue queue = Volley.newRequestQueue(this);
-        String url ="http://testmyskills.herokuapp.com/api/v1/tests.json?technology_id="+para;
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        String restoredAuth = prefs.getString("auth", null);
+        String restoredEmail = prefs.getString("email", null);
+
+        String url ="http://testmyskills.herokuapp.com/api/v1/tests.json?technology_id="+para+"&auth_token=" + restoredAuth+"&"+ "email="+restoredEmail;
 
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
@@ -85,6 +98,23 @@ public class TestListActivity extends ActionBarActivity {
         queue.add(stringRequest);
 
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (!bp.handleActivityResult(requestCode, resultCode, data))
+            super.onActivityResult(requestCode, resultCode, data);
+    }
+
+
+    @Override
+    public void onDestroy() {
+        if (bp != null)
+            bp.release();
+
+        super.onDestroy();
+    }
+
+
 
     public TestListModel[] parse(String jsonLine)
     {
@@ -122,43 +152,23 @@ public class TestListActivity extends ActionBarActivity {
         //   - PAYMENT_INTENT_ORDER to create a payment for authorization and capture
         //     later via calls from your server.
 
-        PayPalPayment payment = new PayPalPayment(new BigDecimal(".5"), "USD", "JAVA Test 1",
-                PayPalPayment.PAYMENT_INTENT_SALE);
+//        PayPalPayment payment = new PayPalPayment(new BigDecimal(".5"), "USD", "JAVA Test 1",
+//                PayPalPayment.PAYMENT_INTENT_SALE);
+//
+//        Intent intent = new Intent(this, PaymentActivity.class);
+//
+//        // send the same configuration for restart resiliency
+//        intent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, config);
+//
+//        intent.putExtra(PaymentActivity.EXTRA_PAYMENT, payment);
+//
+//        startActivityForResult(intent, 0);
 
-        Intent intent = new Intent(this, PaymentActivity.class);
-
-        // send the same configuration for restart resiliency
-        intent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, config);
-
-        intent.putExtra(PaymentActivity.EXTRA_PAYMENT, payment);
-
-        startActivityForResult(intent, 0);
+        bp.purchase(TestListActivity.this, "android.test.purchased");
+        bp.consumePurchase("android.test.purchased");
     }
 
-    @Override
-    protected void onActivityResult (int requestCode, int resultCode, Intent data) {
-        if (resultCode == Activity.RESULT_OK) {
-            PaymentConfirmation confirm = data.getParcelableExtra(PaymentActivity.EXTRA_RESULT_CONFIRMATION);
-            if (confirm != null) {
-                try {
-                    Log.i("paymentExample", confirm.toJSONObject().toString(4));
 
-                    // TODO: send 'confirm' to your server for verification.
-                    // see https://developer.paypal.com/webapps/developer/docs/integration/mobile/verify-mobile-payment/
-                    // for more details.
-
-                } catch (JSONException e) {
-                    Log.e("paymentExample", "an extremely unlikely failure occurred: ", e);
-                }
-            }
-        }
-        else if (resultCode == Activity.RESULT_CANCELED) {
-            Log.i("paymentExample", "The user canceled.");
-        }
-        else if (resultCode == PaymentActivity.RESULT_EXTRAS_INVALID) {
-            Log.i("paymentExample", "An invalid Payment or PayPalConfiguration was submitted. Please see the docs.");
-        }
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -180,5 +190,25 @@ public class TestListActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onProductPurchased(String s, TransactionDetails transactionDetails) {
+
+    }
+
+    @Override
+    public void onPurchaseHistoryRestored() {
+
+    }
+
+    @Override
+    public void onBillingError(int i, Throwable throwable) {
+
+    }
+
+    @Override
+    public void onBillingInitialized() {
+
     }
 }

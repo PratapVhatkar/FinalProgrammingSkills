@@ -36,6 +36,8 @@
     <string name="title_activity_registration">Registration</string>
     <string name="banner_ad_unit_id">ca-app-pub-7583084659008726/5733376418</string>
     <string name="title_activity_result">Result</string>
+    <string name="in_app_billing_key">MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAge54qNk4NJIyMeLa6Q79ctOvzJgxP05DfVAIgJDBSwYeG95iHcECmUKuQbOxJKhSe1OFzhK+lKDgpgQmMXhckPBTCstkeaIuSf+fi4/qG1r1XlYqLJkKEXcuSkDunFU90QKuyIB61zrzkU2x9KbGuWORtrPqkqE7BBnfCBxIZVqGwKAg7TPwGpuudR8OxjIEL70P248anFjxg9mW186HTNizj7nqRMhApucwKDHHNUrsfl2QxRlMU0bcU5QHwamU6z+VD0VXuK7luOWZRCm4FzQSAMfs9IdtKMtt1EHAS8x3RYkeRrzH8zcXuH5WgMTOY9d5yUGnHiYHTU7EHESAJQIDAQAB</string>
+    <string name="title_activity_test_history">TestHistory</string>
 
 
 </resources>

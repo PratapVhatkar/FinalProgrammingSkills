@@ -3,6 +3,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.service.carrier.CarrierMessagingService;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.ActionBarActivity;
@@ -16,6 +17,7 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -29,6 +31,8 @@ import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
 import com.facebook.Profile;
 import com.facebook.ProfileTracker;
 import com.facebook.login.LoginResult;
@@ -52,6 +56,10 @@ import com.google.android.gms.plus.People.LoadPeopleResult;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
 import com.google.android.gms.plus.model.people.PersonBuffer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -144,30 +152,52 @@ public class PreLogin extends Activity implements
     protected void onCreate(Bundle savedInstanceState) {
         FacebookSdk.sdkInitialize(getApplicationContext());
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_pre_login);
-        updateWithToken(AccessToken.getCurrentAccessToken());
-        ButtonFlat toRegistration = (ButtonFlat) findViewById(R.id.btnRegistration);
-        toRegistration.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-//to registration
-                Intent intent = new Intent(PreLogin.this, Registration.class);
-                startActivity(intent);
-                finish();
-            }
-        });
-        try {
-            PackageInfo info = getPackageManager().getPackageInfo(
-                    "programminginterviews.vhatkar.pratap.com.programmingskills",
-                    PackageManager.GET_SIGNATURES);
-            for (Signature signature : info.signatures) {
-                MessageDigest md = MessageDigest.getInstance("SHA");
-                md.update(signature.toByteArray());
-                Log.d("KeyHash:", Base64.encodeToString(md.digest(), Base64.DEFAULT));
-            }
-        } catch (NameNotFoundException e) {
-        } catch (NoSuchAlgorithmException e) {
+
+        if (checkAuthEmailExists()) {
+
+            Intent intents = new Intent(PreLogin.this, MainActivity.class);
+            startActivity(intents);
+            finish();
+
         }
+        else {
+            setContentView(R.layout.activity_pre_login);
+            updateWithToken(AccessToken.getCurrentAccessToken());
+            ButtonFlat toRegistration = (ButtonFlat) findViewById(R.id.btnRegistration);
+            toRegistration.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+//to registration
+                    Intent intent = new Intent(PreLogin.this, Registration.class);
+                    startActivity(intent);
+                    finish();
+                }
+            });
+            try {
+                PackageInfo info = getPackageManager().getPackageInfo(
+                        "programminginterviews.vhatkar.pratap.com.programmingskills",
+                        PackageManager.GET_SIGNATURES);
+                for (Signature signature : info.signatures) {
+                    MessageDigest md = MessageDigest.getInstance("SHA");
+                    md.update(signature.toByteArray());
+                    Log.d("KeyHash:", Base64.encodeToString(md.digest(), Base64.DEFAULT));
+                }
+            } catch (NameNotFoundException e) {
+            } catch (NoSuchAlgorithmException e) {
+            }
+
+
+
+
+
+
+
+
+
+
+
+
+        /*
         LoginButton loginButton = (LoginButton) findViewById(R.id.login_button);
         loginButton.setReadPermissions("user_friends");
         callbackManager = CallbackManager.Factory.create();
@@ -178,9 +208,17 @@ public class PreLogin extends Activity implements
                 AccessToken accessToken = AccessToken.getCurrentAccessToken();
                 Log.e("Token", accessToken.toString());
                 signedIn = true;
-// SharedPreferences.Editor editor = sharedPref.edit();
-// editor.putBoolean("signedin", signedIn);
-// editor.apply();
+
+
+                Profile profile = Profile.getCurrentProfile();
+
+
+
+
+
+
+
+                Toast.makeText(PreLogin.this, "Welcome " + profile.getName(), Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(PreLogin.this, MainActivity.class);
                 startActivity(intent);
                 finish();
@@ -200,51 +238,277 @@ public class PreLogin extends Activity implements
                 }
             };
         });
-//Google setup
-        mSignInButton = (SignInButton) findViewById(R.id.sign_in_button);
-// Button listeners
-        mSignInButton.setOnClickListener(this);
-        if (savedInstanceState != null) {
-            mSignInProgress = savedInstanceState
-                    .getInt(SAVED_PROGRESS, STATE_DEFAULT);
-            Intent intent = new Intent(PreLogin.this, MainActivity.class);
-            startActivity(intent);
-            finish();
-        }
-        mGoogleApiClient = buildGoogleApiClient();
-        ButtonRectangle userlogin = (ButtonRectangle) findViewById(R.id.userLogin);
-        userlogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                final EditText useremail = (EditText)findViewById(R.id.username);
-                final EditText password = (EditText)findViewById(R.id.passwordtextfield);
-                if(isValidEmail(useremail.getText())) {
-                    StringRequest sr = new StringRequest(Request.Method.POST, "http://testmyskills.herokuapp.com/api/v1/sessions.json", new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
-                            System.out.print(response);
-                        }
-                    }, new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error)
-                        {
-                            System.out.print("Error");
-                        }
-                    })
-                    {
-                        @Override
-                        protected Map<String, String> getParams() {
-                            Map<String, String> params = new HashMap<String, String>();
-                            params.put("username", useremail.getText().toString());
-                            params.put("password", password.getText().toString());
-                            return params;
-                        }
-                    };
+
+
+
+        */
+
+
+            LoginButton loginButton = (LoginButton) findViewById(R.id.login_button);
+
+            loginButton.setReadPermissions(Arrays.asList("public_profile, email, user_birthday"));
+
+            callbackManager = CallbackManager.Factory.create();
+
+            // Callback registration
+            loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+                @Override
+                public void onSuccess(LoginResult loginResult) {
+                    // App code
+                    GraphRequest request = GraphRequest.newMeRequest(
+                            loginResult.getAccessToken(),
+                            new GraphRequest.GraphJSONObjectCallback() {
+                                @Override
+                                public void onCompleted(
+                                        JSONObject object,
+                                        GraphResponse response) {
+                                    // Application code
+                                    Log.v("LoginActivity", response.toString());
+                                    String email = null;
+                                    String user_id = null;
+                                    String name = null;
+                                    try {
+                                        email = object.getString("email");
+                                        user_id = object.getString("id");
+                                        name = object.getString("name");
+
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+
+                                    try {
+                                        socialNetworkRequest(email, "facebook", user_id, name);
+
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+
+                                    Toast.makeText(PreLogin.this, "Welcome" + name, Toast.LENGTH_SHORT).show();
+
+//                                JsonParser parser = new JsonParser();
+//                                JsonObject rootObj = parser.parse(object.toString()).getAsJsonObject();
+////
+////                                JsonElement jelement = new JsonParser().parse(response.toString());
+////                                JsonObject jobject = jelement.getAsJsonObject();
+//
+//                                JsonObject userObject2 = rootObj.getAsJsonObject("Response").getAsJsonObject();
+//                                JsonObject userObject = userObject2.getAsJsonObject("graphObject").getAsJsonObject();
+//
+//                                String user_id = userObject.get("id").getAsString();
+//                                String auth = AccessToken.getCurrentAccessToken().toString();
+//                                String name = userObject.get("name").getAsString();
+//                                String email = userObject.get("email").getAsString();
+//
+//                                JSONObject js = new JSONObject();
+
+
+
+/*
+//                                provider: 'facebook', uid: '12457122', name: 'somename', email: 'someemail@test.com'
+                                JSONObject jsonobject_one = new JSONObject();
+                                try {
+                                    jsonobject_one.put("email", email);
+                                    jsonobject_one.put("name", name);
+                                    jsonobject_one.put("id", user_id);
+                                    jsonobject_one.put("auth", AccessToken.getCurrentAccessToken().toString());
+                                    js.put("user", jsonobject_one);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+
+                                RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+                                JsonObjectRequest jsObjRequest = new JsonObjectRequest(Request.Method.POST, "http://testmyskills.herokuapp.com/api/v1/registrations/social_registration", js,
+                                        new Response.Listener<JSONObject>() {
+                                            @Override
+                                            public void onResponse(JSONObject response) {
+                                                System.out.println(response);
+                                                Toast.makeText(PreLogin.this, "Sucess", Toast.LENGTH_SHORT).show();
+
+                                                JsonElement jelement = new JsonParser().parse(response.toString());
+                                                JsonObject jobject = jelement.getAsJsonObject();
+
+                                                boolean flag = false;
+                                                try {
+                                                    if (jobject.getAsJsonObject("user") == null) {
+                                                        flag = false;
+                                                    } else {
+                                                        flag = true;
+                                                    }
+                                                } catch (Exception e) {
+                                                    flag = false;
+                                                }
+
+
+                                                if (flag) {
+                                                    JsonObject userObject = jobject.getAsJsonObject("user").getAsJsonObject();
+                                                    int user_id = userObject.get("id").getAsInt();
+                                                    String role = userObject.get("role").getAsString();
+                                                    String auth = userObject.get("auth_token").getAsString();
+                                                    String name = userObject.get("name").getAsString();
+                                                    String email = userObject.get("email").getAsString();
+
+                                                    AppDelegate g = (AppDelegate) getApplication();
+                                                    g.setName(name);
+                                                    g.setUserAuth(auth);
+                                                    g.setUserid(user_id);
+                                                    g.setCurrentUserEmail(email);
+
+                                                    Intent intent = new Intent(PreLogin.this, MainActivity.class);
+                                                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                                    getApplicationContext().startActivity(intent);
+                                                } else {
+//                                    JsonObject userObject = jobject.getAsJsonObject("user").getAsJsonObject();
+                                                    String str = jobject.get("message").getAsString();
+                                                    Toast.makeText(PreLogin.this, str, Toast.LENGTH_SHORT).show();
+                                                }
+
+                                            }
+                                        },
+                                        new Response.ErrorListener() {
+                                            @Override
+                                            public void onErrorResponse(VolleyError error) {
+                                                Toast.makeText(PreLogin.this, "Error ->" + error.toString(), Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+
+                                jsObjRequest.setRetryPolicy(new DefaultRetryPolicy(5000,
+                                        DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                                        DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+
+                                queue.add(jsObjRequest);
+
+                                Toast.makeText(PreLogin.this, "Facebook -> " + response.toString(), Toast.LENGTH_SHORT).show();*/
+                                }
+                            });
+                    Bundle parameters = new Bundle();
+                    parameters.putString("fields", "id,name,email,gender, birthday");
+                    request.setParameters(parameters);
+                    request.executeAsync();
+
+
+                }
+
+                @Override
+                public void onCancel() {
+                    // App code
+                    Log.v("LoginActivity", "cancel");
+                }
+
+                @Override
+                public void onError(FacebookException exception) {
+                    // App code
+                    Log.v("LoginActivity", exception.getCause().toString());
+                }
+            });
+
+
+            ButtonRectangle btn = (ButtonRectangle) findViewById(R.id.userLogin);
+
+            btn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    final EditText useremail = (EditText) findViewById(R.id.passwordtextfield);
+                    final EditText email = (EditText) findViewById(R.id.username);
+
+                    JSONObject js = new JSONObject();
+                    try {
+                        JSONObject jsonobject_one = new JSONObject();
+                        jsonobject_one.put("email", email.getText().toString());
+                        jsonobject_one.put("password", useremail.getText().toString());
+                        js.put("user", jsonobject_one);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
                     RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-                    queue.add(sr);
-                }}
-        });
-    }
+                    JsonObjectRequest jsObjRequest = new JsonObjectRequest(Request.Method.POST, "http://testmyskills.herokuapp.com/api/v1/sessions.json", js,
+                            new Response.Listener<JSONObject>() {
+                                @Override
+                                public void onResponse(JSONObject response) {
+                                    System.out.println(response);
+                                    Toast.makeText(PreLogin.this, "Sucess", Toast.LENGTH_SHORT).show();
+
+                                    JsonElement jelement = new JsonParser().parse(response.toString());
+                                    JsonObject jobject = jelement.getAsJsonObject();
+
+                                    boolean flag = false;
+                                    try {
+                                        if (jobject.getAsJsonObject("user") == null) {
+                                            flag = false;
+                                        } else {
+                                            flag = true;
+                                        }
+                                    } catch (Exception e) {
+                                        flag = false;
+                                    }
+
+
+                                    if (flag) {
+                                        JsonObject userObject = jobject.getAsJsonObject("user").getAsJsonObject();
+                                        int user_id = userObject.get("id").getAsInt();
+                                        String role = userObject.get("role").getAsString();
+                                        String auth = userObject.get("auth_token").getAsString();
+                                        String name = userObject.get("name").getAsString();
+                                        String email = userObject.get("email").getAsString();
+
+                                        AppDelegate g = (AppDelegate) getApplication();
+                                        g.setName(name);
+                                        g.setUserAuth(auth);
+                                        g.setUserid(user_id);
+                                        g.setCurrentUserEmail(email);
+                                        saveAuthEmail(auth, email);
+
+                                        Intent intent = new Intent(PreLogin.this, MainActivity.class);
+                                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                        getApplicationContext().startActivity(intent);
+                                    } else {
+//                                    JsonObject userObject = jobject.getAsJsonObject("user").getAsJsonObject();
+                                        String str = jobject.get("message").getAsString();
+                                        Toast.makeText(PreLogin.this, str, Toast.LENGTH_SHORT).show();
+                                    }
+
+                                }
+                            },
+                            new Response.ErrorListener() {
+                                @Override
+                                public void onErrorResponse(VolleyError error) {
+                                    Toast.makeText(PreLogin.this, "Error ->" + error.toString(), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+
+                    jsObjRequest.setRetryPolicy(new DefaultRetryPolicy(5000,
+                            DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+
+                    queue.add(jsObjRequest);
+
+                }
+            });
+
+
+            mGoogleApiClient = buildGoogleApiClient();
+            mGoogleApiClient.connect();
+
+
+            mSignInButton = (SignInButton) findViewById(R.id.sign_in_button);
+
+            mSignInButton.setOnClickListener(this);
+            if (savedInstanceState != null) {
+                mSignInProgress = savedInstanceState
+                        .getInt(SAVED_PROGRESS, STATE_DEFAULT);
+                Intent intent = new Intent(PreLogin.this, MainActivity.class);
+                startActivity(intent);
+                finish();
+            }
+
+
+            this.findViewById(R.id.sign_in_button).setOnClickListener(this);
+        }
+        }
+
     public final static boolean isValidEmail(CharSequence target) {
         if (target == null) {
             return false;
@@ -252,6 +516,7 @@ public class PreLogin extends Activity implements
             return android.util.Patterns.EMAIL_ADDRESS.matcher(target).matches();
         }
     }
+
     private void updateWithToken(AccessToken currentAccessToken) {
         if (currentAccessToken != null) {
             new Handler().postDelayed(new Runnable() {
@@ -270,6 +535,7 @@ public class PreLogin extends Activity implements
             }, 0);
         }
     }
+
     private GoogleApiClient buildGoogleApiClient() {
         GoogleApiClient.Builder builder = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
@@ -282,10 +548,17 @@ public class PreLogin extends Activity implements
         }
         return builder.build();
     }
+
     @Override
     public void onConnected(Bundle connectionHint) {
         Log.i(TAG, "onConnected");
         Toast.makeText(this, "User is connected!", Toast.LENGTH_LONG).show();
+//
+//        Intent intent = new Intent(PreLogin.this, MainActivity.class);
+//        startActivity(intent);
+//        finish();
+
+
 // Intent intent = new Intent(PreLogin.this, MainActivity.class);
 // startActivity(intent);
 // finish();
@@ -303,12 +576,128 @@ public class PreLogin extends Activity implements
             Person currentPerson = Plus.PeopleApi
                     .getCurrentPerson(mGoogleApiClient);
             String personName = currentPerson.getDisplayName();
+
+
+            currentPerson.getId();
+
+            String accountName = Plus.AccountApi.getAccountName(mGoogleApiClient);
+
+            String providername = "Google";
+            String id = currentPerson.getId();
+            String name = currentPerson.getDisplayName();
+
+//            socialNetworkRequest(accountName,providername,id,name);
+
+            try {
+                socialNetworkRequest(accountName, providername, id, name);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+//            { provider: 'facebook', uid: '12457122', name: 'somename', email: 'someemail@test.com' }
+
             Log.i("personName", personName);
 // Intent intent = new Intent(PreLogin.this, MainActivity.class);
 // startActivity(intent);
 // finish();
         }
     }
+
+
+    public void socialNetworkRequest(String email, String provider, String id, String name) throws JSONException {
+
+//        - { provider: 'facebook', uid: '12457122', name: 'somename', email: 'someemail@test.com' }
+
+
+//        JsonObject js = new JsonObject();
+//        js.add("provider", provider);
+//        js.add("uid", id);
+//        js.add("name", name);
+//        js.add("email", email);
+
+        JSONObject js = new JSONObject();
+        js.put("provider", provider);
+        js.put("uid", id);
+        js.put("name", name);
+        js.put("email", email);
+
+
+        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+        JsonObjectRequest jsObjRequest = new JsonObjectRequest(Request.Method.POST, "http://testmyskills.herokuapp.com/api/v1/registrations/social_registration.json", js,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        System.out.println(response);
+
+
+                        JsonElement jelement = new JsonParser().parse(response.toString());
+                        JsonObject jobject = jelement.getAsJsonObject();
+
+
+                        Intent intent1 = new Intent(PreLogin.this, MainActivity.class);
+                        intent1.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        getApplicationContext().startActivity(intent1);
+
+                        boolean flag = false;
+                        try {
+                            if (jobject.getAsJsonObject("user") == null) {
+                                flag = false;
+                            } else {
+                                flag = true;
+                            }
+                        } catch (Exception e) {
+                            flag = false;
+                        }
+
+
+                        if (flag) {
+                            JsonObject userObject = jobject.getAsJsonObject("user").getAsJsonObject();
+                            int user_id = userObject.get("id").getAsInt();
+                            String role = userObject.get("role").getAsString();
+                            String auth = userObject.get("auth_token").getAsString();
+                            String name = userObject.get("name").getAsString();
+                            String email = userObject.get("email").getAsString();
+
+                            AppDelegate g = (AppDelegate) getApplication();
+                            g.setName(name);
+                            g.setUserAuth(auth);
+                            g.setUserid(user_id);
+                            g.setCurrentUserEmail(email);
+
+                            saveAuthEmail(auth,email);
+
+                            Intent intent = new Intent(PreLogin.this, MainActivity.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            getApplicationContext().startActivity(intent);
+
+                            Toast.makeText(PreLogin.this,userObject.toString() , Toast.LENGTH_SHORT).show();
+
+                        } else {
+//                                    JsonObject userObject = jobject.getAsJsonObject("user").getAsJsonObject();
+                            String str = jobject.get("message").getAsString();
+                            Toast.makeText(PreLogin.this, str, Toast.LENGTH_SHORT).show();
+                        }
+
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(PreLogin.this, "Error ->" + error.toString(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+        jsObjRequest.setRetryPolicy(new DefaultRetryPolicy(5000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+
+        queue.add(jsObjRequest);
+
+
+
+}
+
+
     @Override
     public void onResult(People.LoadPeopleResult peopleData) {
         System.out.print(" People Data --->" + peopleData.toString());
@@ -547,5 +936,39 @@ public class PreLogin extends Activity implements
     }
     @Override
     public void onFragmentInteraction(Uri uri) {
+    }
+
+
+    public void saveAuthEmail(String auth,String email)
+    {
+        if(!checkAuthEmailExists())
+        {
+            //save
+
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString("email",email);
+            editor.putString("auth",auth);
+            editor.commit();
+//            editor.apply();
+        }
+
+    }
+
+    boolean checkAuthEmailExists() {
+
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        String restoredAuth = prefs.getString("auth", null);
+        String restoredEmail = prefs.getString("email",null);
+
+        if(restoredAuth == null)
+            return  false;
+
+        if(restoredEmail == null)
+            return false;
+
+        return true;
+
     }
 }

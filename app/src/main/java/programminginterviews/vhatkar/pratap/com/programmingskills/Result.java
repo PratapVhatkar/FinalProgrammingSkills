@@ -1,15 +1,28 @@
 package programminginterviews.vhatkar.pratap.com.programmingskills;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.gc.materialdesign.views.Button;
 import com.gc.materialdesign.views.ButtonFlat;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -60,7 +73,66 @@ public class Result extends ActionBarActivity {
             }
         });
 
+
+        SendResult(calculateResult(userAns,serverAns),testid);
+
+
+
+
     }
+
+    public void SendResult(int percentage,int id )
+    {
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        String restoredAuth = prefs.getString("auth", null);
+        String restoredEmail = prefs.getString("email", null);
+
+        //fill the listview
+        RequestQueue queue = Volley.newRequestQueue(Result.this);
+//                String url ="http://testmyskills.herokuapp.com/api/v1/tests/create_my_test.json?"+"test_id="+para +"&auth_token=" + restoredAuth+"&"+ "email="+restoredEmail;
+
+        JSONObject js = new JSONObject();
+        JSONObject jsonobject_one = new JSONObject();
+        try {
+            jsonobject_one.put("email", restoredEmail);
+            jsonobject_one.put("auth_token",restoredAuth);
+            jsonobject_one.put("test_id",id);
+            jsonobject_one.put("score",percentage);
+            jsonobject_one.put("completed",true);
+            //  { auth_token: user.auth_token, email: user.email, test_id: 2, score: 83, result: 'Passed', completed: true }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+        JsonObjectRequest jsObjRequest = new JsonObjectRequest(Request.Method.POST,"http://testmyskills.herokuapp.com/api/v1/users/save_test_results.json",jsonobject_one,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        System.out.println(response);
+//                        progressBar.setVisibility(View.INVISIBLE);
+                        Toast.makeText(Result.this, "Response ->" + response.toString(), Toast.LENGTH_SHORT).show();
+
+
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(Result.this, "Error ->" + error.toString(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+        jsObjRequest.setRetryPolicy(new DefaultRetryPolicy(5000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+
+        queue.add(jsObjRequest);
+    }
+
 
     public int calculateResult(ArrayList<Integer> userAnsLists,ArrayList<Integer> serverAnss)
     {

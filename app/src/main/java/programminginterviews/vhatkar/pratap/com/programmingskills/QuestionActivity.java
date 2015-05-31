@@ -3,6 +3,8 @@ package programminginterviews.vhatkar.pratap.com.programmingskills;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -140,7 +142,13 @@ public class QuestionActivity extends ActionBarActivity {
         Intent intent = getIntent();
         para = intent.getIntExtra("test_id", 0);
 
-        String url = "http://testmyskills.herokuapp.com/api/v1/questions.json?test_id=" + para;
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        String restoredAuth = prefs.getString("auth", null);
+        String restoredEmail = prefs.getString("email", null);
+
+        String url = "http://testmyskills.herokuapp.com/api/v1/questions.json?test_id=" + para +"&auth_token=" + restoredAuth+"&"+ "email="+restoredEmail;
+
 
         reviewAns = intent.getIntegerArrayListExtra("serverAns");
         userAns = intent.getIntegerArrayListExtra("userans");

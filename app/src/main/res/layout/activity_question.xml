@@ -1,14 +1,14 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent" android:paddingLeft="0dp"
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
     tools:context="programminginterviews.vhatkar.pratap.com.programmingskills.QuestionActivity"
 
     >
 
 
-
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
     >
@@ -39,26 +39,6 @@
             />
 
     </RelativeLayout>
-
-
-    <!--<programminginterviews.vhatkar.pratap.com.programmingskills.HorizontialListView-->
-        <!--android:id="@+id/listview"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:focusable="true"-->
-        <!--android:paddingLeft="0dp"-->
-        <!--android:paddingTop="0dp"-->
-        <!--/>-->
-
-        <!--<ListView-->
-            <!--android:id="@+id/listview"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:focusable="true"-->
-            <!--android:paddingLeft="0dp"-->
-            <!--android:paddingTop="0dp"-->
-
-            <!--/>-->
 
         <com.gc.materialdesign.views.ScrollView
             android:layout_width="wrap_content"
@@ -203,10 +183,28 @@
 
 </LinearLayout>
 
-    <RelativeLayout
-        android:layout_width="match_parent"
+
+
+    <!--<RelativeLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:id="@+id/bottombtns"-->
+        <!-->-->
+
+
+
+
+
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/adView"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        >
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        ads:adSize="BANNER"
+        ads:adUnitId="@string/banner_ad_unit_id">
+    </com.google.android.gms.ads.AdView>
+
 
         <com.gc.materialdesign.views.ButtonFlat
             android:layout_width="wrap_content"
@@ -215,13 +213,13 @@
             android:paddingRight="40dp"
             android:paddingLeft="40dp"
             android:paddingBottom="20dp"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true"
+
             android:text="Back"
             android:id="@+id/backBtn"
             android:padding="15dp"
 
-            />
+            android:layout_above="@+id/adView"
+            android:layout_toStartOf="@+id/adView" />
 
         <com.gc.materialdesign.views.ButtonFlat
             android:layout_width="wrap_content"
@@ -230,14 +228,16 @@
             android:paddingRight="40dp"
             android:paddingLeft="40dp"
             android:paddingBottom="20dp"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
+
             android:text="Next"
             android:id="@+id/nextBtn"
             android:focusable="false"
             android:padding="15dp"
-            />
+            android:layout_alignTop="@+id/backBtn"
+            android:layout_toRightOf="@+id/adView"
+            android:layout_toEndOf="@+id/adView" />
 
-    </RelativeLayout>
+    <!--</RelativeLayout>-->
+
 
 </RelativeLayout>

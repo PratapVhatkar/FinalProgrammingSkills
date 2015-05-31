@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:paddingLeft="5dp"
+    android:paddingRight="5dp"
+    android:paddingTop="15dp"
+    android:paddingBottom="15dp"
+    android:background="#F5F5F5"
+    >
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:divider="@drawable/commonviewdivider"
+            >
+
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/testName"
+                android:text="@string/tech"
+                android:paddingLeft="5dp"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/totalQuestion"
+                android:paddingLeft="5dp"
+                android:text="Total 50 Questions"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                />
+
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/totalAppear"
+                android:paddingLeft="5dp"
+                android:text="158 people have given this test"
+                android:layout_alignParentBottom="true"
+                android:paddingBottom="5dp"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:layout_gravity="left"
+                />
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:textSize="10dp"
+            android:paddingRight="20dp"
+            android:textColor="@color/myPrimaryColor"
+            android:paddingBottom="15dp"
+            android:text="You have scored"/>
+
+       <TextView
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_alignParentRight="true"
+           android:textSize="35dp"
+           android:paddingRight="20dp"
+           android:id="@+id/scoreTextview"
+           android:layout_alignParentBottom="true"
+           android:textColor="@color/myPrimaryColor"
+           android:text="83%"/>
+
+    </RelativeLayout>
+
+</LinearLayout>

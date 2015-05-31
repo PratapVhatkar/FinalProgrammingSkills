@@ -15,9 +15,9 @@
        <TextView
            android:layout_width="wrap_content"
            android:layout_height="wrap_content"
-           android:text=" Java "
+           android:text=" Advanced C++ Test 1 "
            android:textAppearance="?android:attr/textAppearanceLarge"
-           android:textSize="50dp"
+           android:textSize="30dp"
            android:textColor="@color/myPrimaryColor"
            android:id="@+id/testName"
            android:layout_gravity="center_horizontal|center_vertical" />
@@ -35,8 +35,7 @@
                android:text=" Please select the mode of test :- "
                android:textAppearance="?android:attr/textAppearanceLarge"
                android:textSize="20dp"
-               android:paddingLeft="30dp"
-               android:textColor="@color/myPrimaryColor"
+               android:paddingLeft="0dp"
                android:id="@+id/testMode"
                 />
 
@@ -58,7 +57,7 @@
                android:textAppearance="?android:attr/textAppearanceLarge"
                android:textSize="20dp"
                android:paddingLeft="20dp"
-               android:textColor="@color/myPrimaryColor"
+
                android:id="@+id/option1"
                android:paddingTop="0dp"
                android:layout_gravity="center_horizontal|center_vertical" />
@@ -81,7 +80,6 @@
                android:textAppearance="?android:attr/textAppearanceLarge"
                android:textSize="20dp"
                android:paddingLeft="20dp"
-               android:textColor="@color/myPrimaryColor"
                android:id="@+id/option2"
                android:layout_gravity="center_horizontal|center_vertical" />
 
@@ -109,5 +107,17 @@
         android:layout_alignParentLeft="true"
         >
     </com.gc.materialdesign.views.ButtonRectangle>
+
+    <com.gc.materialdesign.views.ProgressBarCircularIndeterminate
+        android:id="@+id/progressBarCircularIndeterminate"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:indeterminateOnly="true"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:keepScreenOn="true"
+        android:background="#1E88E5"
+
+        />
 
 </RelativeLayout>

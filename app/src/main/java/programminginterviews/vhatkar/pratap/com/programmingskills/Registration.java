@@ -1,6 +1,8 @@
 package programminginterviews.vhatkar.pratap.com.programmingskills;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -105,6 +107,22 @@ public class Registration extends ActionBarActivity {
                                     g.setUserid(user_id);
                                     g.setCurrentUserEmail(email);
 
+//                                    SharedPreferences.Editor editor = getPreferences(MODE_PRIVATE).edit();
+//                                    editor.putString("email", email);
+//                                    editor.putString("auth", auth);
+//                                    editor.apply();
+
+
+                                    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                                    editor.putString("email",email);
+                                    editor.putString("auth",auth);
+                                    editor.commit();
+
+                                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                                    String restoredAuth = prefs.getString("auth", null);
+                                    String restoredEmail = prefs.getString("email",null);
+
                                     Intent intent = new Intent(Registration.this, MainActivity.class);
                                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                     getApplicationContext().startActivity(intent);
@@ -135,6 +153,7 @@ public class Registration extends ActionBarActivity {
             }
         });
     }
+
 
 
 
