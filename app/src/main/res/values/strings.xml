@@ -38,6 +38,9 @@
     <string name="title_activity_result">Result</string>
     <string name="in_app_billing_key">MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAge54qNk4NJIyMeLa6Q79ctOvzJgxP05DfVAIgJDBSwYeG95iHcECmUKuQbOxJKhSe1OFzhK+lKDgpgQmMXhckPBTCstkeaIuSf+fi4/qG1r1XlYqLJkKEXcuSkDunFU90QKuyIB61zrzkU2x9KbGuWORtrPqkqE7BBnfCBxIZVqGwKAg7TPwGpuudR8OxjIEL70P248anFjxg9mW186HTNizj7nqRMhApucwKDHHNUrsfl2QxRlMU0bcU5QHwamU6z+VD0VXuK7luOWZRCm4FzQSAMfs9IdtKMtt1EHAS8x3RYkeRrzH8zcXuH5WgMTOY9d5yUGnHiYHTU7EHESAJQIDAQAB</string>
     <string name="title_activity_test_history">TestHistory</string>
+    <string name="title_activity_videotutorial">videotutorial</string>
+    <string name="google_api_key">AIzaSyDHh8_2IA5Ntbjk7Is6wYkLd6-BBiIxWgU</string>
+
 
 
 </resources>

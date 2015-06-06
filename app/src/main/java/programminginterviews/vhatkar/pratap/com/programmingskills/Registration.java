@@ -65,7 +65,7 @@ public class Registration extends ActionBarActivity {
                 }
 
                 RequestQueue queue =  Volley.newRequestQueue(getApplicationContext());
-                JsonObjectRequest jsObjRequest = new JsonObjectRequest(Request.Method.POST,"http://testmyskills.herokuapp.com/api/v1/registrations.json",js,
+                JsonObjectRequest jsObjRequest = new JsonObjectRequest(Request.Method.POST,"http://52.24.180.90/api/v1/registrations.json",js,
                         new Response.Listener<JSONObject>() {
                             @Override
                             public void onResponse(JSONObject response) {

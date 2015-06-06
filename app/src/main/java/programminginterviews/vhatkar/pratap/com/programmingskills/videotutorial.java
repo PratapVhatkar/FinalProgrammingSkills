@@ -23,18 +23,32 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 
-public class TestHistory extends ActionBarActivity {
-
-
+public class videotutorial extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_test_history);
+        setContentView(R.layout.activity_videotutorial);
+
+/*
+        videoModel videoModel1 = new videoModel("https://www.youtube.com/watch?v=afNHG3jyPU4","Apple Developer Conference 2015");
+        videoModel videoModel2 = new videoModel("https://www.youtube.com/watch?v=dyK9swyt154","Google IO 2015");
+
+        videoModel[] array = new videoModel[2];
+        array[0] = videoModel1;
+        array[1] = videoModel2;
 
 
-        setTitle("TEST HISTORY");
-    //    getActionBar().setIcon(R.mipmap.ic_launcher);
+        ListView listView = (ListView) findViewById(R.id.list);
+
+        videoAdapter mAdapter = new videoAdapter(getApplicationContext(), array);
+        listView.setAdapter(mAdapter);
+
+
+        */
+
+        Intent intent = getIntent();
+        int para = intent.getIntExtra("techid", 0);
 
         RequestQueue queue = Volley.newRequestQueue(this);
 
@@ -42,8 +56,9 @@ public class TestHistory extends ActionBarActivity {
         String restoredAuth = prefs.getString("auth", null);
         String restoredEmail = prefs.getString("email", null);
 
-        String url ="http://52.24.180.90/api/v1/users/my_tests.json?" + "auth_token=" + restoredAuth+"&"+ "email="+restoredEmail;
-//        http://localhost:3000/api/v1/tests/my_tests.json?
+        //"http://localhost:3000/api/v1/videos.json?auth_token=#{user.auth_token}&email=#{user.email}&technology_id=1"
+        String url ="http://52.24.180.90/api/v1/videos.json?technology_id="+para+"&auth_token=" + restoredAuth+"&"+ "email="+restoredEmail;
+
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override
@@ -52,10 +67,9 @@ public class TestHistory extends ActionBarActivity {
                         System.out.println(response);
 //                        ProgressBarCircularIndeterminate progressBar = (ProgressBarCircularIndeterminate)findViewById(R.id.progressBarCircularIndeterminate);
 //                        progressBar.setVisibility(View.INVISIBLE);
-                        ListView listView = (ListView) findViewById(R.id.testList);
-                        TestHistoryAdapter mAdapter = new TestHistoryAdapter(TestHistory.this, parse(response));
+                        ListView listView = (ListView) findViewById(R.id.list);
+                        videoAdapter mAdapter = new videoAdapter(getApplicationContext(), parse(response));
                         listView.setAdapter(mAdapter);
-
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -67,64 +81,38 @@ public class TestHistory extends ActionBarActivity {
         });
 
         queue.add(stringRequest);
+
+
     }
 
 
-    public TestHistorymodel[] parse(String jsonLine)
-    {
+    public videoModel[] parse(String jsonLine) {
+
         System.out.println("\n\n\nIncoming response----->\n" + jsonLine);
         JsonElement jelement = new JsonParser().parse(jsonLine);
         JsonObject jobject = jelement.getAsJsonObject();
-        JsonArray jarray = jobject.getAsJsonArray("tests");
+        JsonArray jarray = jobject.getAsJsonArray("videos");
 
-        TestHistorymodel[] array = new TestHistorymodel[jarray.size()];
+        videoModel[] array = new videoModel[jarray.size()];
 
         for(int i=0 ; i < jarray.size();i++){
 
             JsonObject temp = jarray.get(i).getAsJsonObject();
-            String testName = temp.get("name").getAsString();
-            int test_id = temp.get("id").getAsInt();
-
-
-            int user_id = 0;//temp.get("user_id").getAsInt();
-            boolean isPaid = temp.get("is_paid").getAsBoolean();
-            String price = temp.get("price").getAsString();
-            int techId = temp.get("technology_id").getAsInt();
-            int questionattempt = temp.get("total_questions").getAsInt();
-            String date = temp.get("created_at").getAsString();
-
-            int user_attempt = temp.get("users_attempted").getAsInt();
-            String score = "";
-            if(!temp.get("test_result").isJsonNull()) {
-                JsonObject test_result = temp.get("test_result").getAsJsonObject();
-
-                if (test_result != null) {
-                    score = test_result.get("score").getAsString();
-                }
-                else {
-                    score = "Incomplete";
-                }
-            }
-
-            TestHistorymodel model = new TestHistorymodel(testName,test_id,user_id,isPaid,price,techId,user_attempt,questionattempt,score,date);
+            String str = temp.get("name").getAsString();
+            int id = temp.get("id").getAsInt();
+            String url = temp.get("url").getAsString();
+            videoModel model = new videoModel(url,str,id);
             array[i] = model;
         }
 
         return array;
     }
 
-
-
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-
-        getMenuInflater().inflate(R.menu.menu_test_history, menu);
-
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_videotutorial, menu);
         return true;
-
-
-
     }
 
     @Override
@@ -140,14 +128,5 @@ public class TestHistory extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onBackPressed()
-    {
-        super.onBackPressed();
-        startActivity(new Intent(TestHistory.this, MainActivity.class));
-        finish();
-
     }
 }

@@ -111,6 +111,22 @@
             android:name=".TestHistory"
             android:label="@string/title_activity_test_history" >
         </activity>
+        <activity
+            android:name=".videotutorial"
+            android:label="@string/title_activity_videotutorial" >
+        </activity>
+
+        <activity
+            android:name="com.thefinestartist.ytpa.YouTubePlayerActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:screenOrientation="sensor"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
+
+        <!--Need Your Google API Key-->
+        <meta-data
+            android:name="com.thefinestartist.ytpa.YouTubePlayerActivity.ApiKey"
+            android:value="@string/google_api_key" />
+
     </application>
 
 </manifest>

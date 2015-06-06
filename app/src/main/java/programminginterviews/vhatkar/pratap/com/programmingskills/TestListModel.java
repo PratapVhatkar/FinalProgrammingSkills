@@ -13,8 +13,12 @@ public class TestListModel {
     private String price;
     private int user_id;
     private int technologyId;
+    private int questionAttept;
+    private int userAttempt;
+    private boolean is_user_purchased;
 
-    TestListModel(String myTest_name,int myTest_id,int myUserid,boolean Paid,String myPrice, int mytechnologyId)
+
+    TestListModel(String myTest_name,int myTest_id,int myUserid,boolean Paid,String myPrice, int mytechnologyId,int questionAttept,int userAttempt,boolean isPurchased)
     {
         this.testid = myTest_id;
         this.technologyId = mytechnologyId;
@@ -22,6 +26,25 @@ public class TestListModel {
         this.isPaid = Paid;
         this.price = myPrice;
         this.user_id = myUserid;
+        this.questionAttept = questionAttept;
+        this.userAttempt = userAttempt;
+        this.is_user_purchased = isPurchased;
+    }
+
+    public boolean Is_user_purchased()
+    {
+       return this.is_user_purchased;
+    }
+
+
+    public int getUserAttempt()
+    {
+        return this.userAttempt;
+    }
+
+    public int getQuestionAttept()
+    {
+        return this.questionAttept;
     }
 
     public int getTestid()

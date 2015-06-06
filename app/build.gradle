@@ -9,7 +9,7 @@ android {
         minSdkVersion 11
         targetSdkVersion 22
         versionCode 1
-        versionName "1.0"
+        versionName "1"
     }
     buildTypes {
         release {
@@ -46,6 +46,8 @@ dependencies {
     compile 'com.facebook.android:facebook-android-sdk:4.0.0'
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.anjlab.android.iab.v3:library:1.0.+@aar'
+    compile 'com.thefinestartist:ytpa:1.1.1'
+
 
 
 }

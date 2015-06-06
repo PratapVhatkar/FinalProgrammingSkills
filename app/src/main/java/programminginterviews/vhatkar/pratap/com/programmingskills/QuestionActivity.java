@@ -32,6 +32,7 @@ import com.android.volley.toolbox.Volley;
 import com.gc.materialdesign.views.Button;
 import com.gc.materialdesign.views.ButtonFlat;
 import com.gc.materialdesign.widgets.Dialog;
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -96,8 +97,9 @@ public class QuestionActivity extends ActionBarActivity {
     private LinearLayout rl3;
     private LinearLayout rl4;
 
+    boolean isPracticeMode ;
 
-
+    private String responseStr;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -147,59 +149,101 @@ public class QuestionActivity extends ActionBarActivity {
         String restoredAuth = prefs.getString("auth", null);
         String restoredEmail = prefs.getString("email", null);
 
-        String url = "http://testmyskills.herokuapp.com/api/v1/questions.json?test_id=" + para +"&auth_token=" + restoredAuth+"&"+ "email="+restoredEmail;
+        String url = "http://52.24.180.90/api/v1/questions.json?test_id=" + para +"&auth_token=" + restoredAuth+"&"+ "email="+restoredEmail;
 
 
         reviewAns = intent.getIntegerArrayListExtra("serverAns");
         userAns = intent.getIntegerArrayListExtra("userans");
         isReview = getIntent().getExtras().getBoolean("isReview");
+        isPracticeMode = getIntent().getExtras().getBoolean("isPractice");
+        String reponseString  = getIntent().getExtras().getString("savedResponse");
+
+        nextBtn.setVisibility(View.GONE);
+        endTest.setVisibility(View.GONE);
+
+        if(isReview==false) {
+
+            endTest.setText("END TEST");
+            nextBtn.setVisibility(View.VISIBLE);
+            endTest.setVisibility(View.VISIBLE);
 
 
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        System.out.println(response);
+            radiobtn1.setEnabled(true);
+            radiobtn2.setEnabled(true);
+            radiobtn3.setEnabled(true);
+            radiobtn4.setEnabled(true);
 
-                        qResposne = parse(response);
-                        currentQuestion = 0;
-                        fillnext(0);
+            StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
 
+                           responseStr =  response;
+                            System.out.println(response);
+                            qResposne = parse(response);
+                            currentQuestion = 0;
+                            fillnext(0);
 
+                            for (int i = 0; i < qResposne.length; i++) {
+                                seriesOfAnsers.add(i, 998);
+                                AnswerModel[] model = qResposne[i].getAnswerModel();
 
+                                for (int j = 0; j < 4; j++) {
+                                    if (model[j].isCorrectFlag())
+                                        serverCorrectans.add(i, j + 1);
+                                }
 
+                            }
 
-                        for(int i=0 ; i < qResposne.length ; i++ )
-                        {
-                            seriesOfAnsers.add(i,998);
-
-                            AnswerModel[] model = qResposne[i].getAnswerModel();
-
-                            for(int j=0 ; j < 4 ; j++ )
-                            {
-                             if(model[j].isCorrectFlag())
-                                serverCorrectans.add(i,j+1);
+                            if (isReview == true) {
+                                reviewTestManagemanet(reviewAns.get(currentQuestion), currentQuestion);
+                                reviewTest(userAns.get(currentQuestion));
                             }
 
                         }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
 
-                        if(isReview == true)
-                        {
-                            reviewTestManagemanet(reviewAns.get(currentQuestion), currentQuestion);
-                            reviewTest(userAns.get(currentQuestion));
-                        }
+                    System.out.print("Errors--->" + error.toString());
+                }
+            });
 
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
+            queue.add(stringRequest);
+        }
+        else
+        {
+            endTest.setText("END REVIEW");
 
-                System.out.print("Errors--->" + error.toString());
+            radiobtn1.setEnabled(false);
+            radiobtn2.setEnabled(false);
+            radiobtn3.setEnabled(false);
+            radiobtn4.setEnabled(false);
+
+
+            nextBtn.setVisibility(View.VISIBLE);
+            endTest.setVisibility(View.VISIBLE);
+
+            qResposne = parse(reponseString);
+            currentQuestion = 0;
+            fillnext(0);
+
+            for (int i = 0; i < qResposne.length; i++) {
+                seriesOfAnsers.add(i, 998);
+                AnswerModel[] model = qResposne[i].getAnswerModel();
+
+                for (int j = 0; j < 4; j++) {
+                    if (model[j].isCorrectFlag())
+                        serverCorrectans.add(i, j + 1);
+                }
+
             }
-        });
 
-        queue.add(stringRequest);
-
+            if (isReview == true) {
+                reviewTestManagemanet(reviewAns.get(currentQuestion), currentQuestion);
+                reviewTest(userAns.get(currentQuestion));
+            }
+        }
         //Nextbtn
 
         nextBtn = (ButtonFlat) findViewById(R.id.nextBtn);
@@ -303,9 +347,16 @@ public class QuestionActivity extends ActionBarActivity {
 
 
                 final float percentage =( totalCorrect / totalQuestions) * 100;
-
-                String s = "End this test ?";
-                String ss = "all the progress will be losed";
+                String s = "";
+                String ss = "";
+                if(isReview ==false) {
+                     s = "End this test ?";
+                     ss = "all the progress will be losed";
+                }else
+                {
+                    s = "End Review";
+                    ss = "";
+                }
 
                 AlertDialog.Builder builder1 = new AlertDialog.Builder(QuestionActivity.this);
                 builder1.setMessage("End this test ?");
@@ -313,13 +364,23 @@ public class QuestionActivity extends ActionBarActivity {
                 builder1.setPositiveButton("Yes",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-                                Intent intent = new Intent(QuestionActivity.this, Result.class);
-                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                intent.putExtra("userans", seriesOfAnsers);
-                                intent.putExtra("serverAns", serverCorrectans);
-                                intent.putExtra("test_id", para);
-                                intent.putExtra("percentage",percentage);
-                                getApplicationContext().startActivity(intent);
+
+
+                                if(isReview==false) {
+                                    Intent intent = new Intent(QuestionActivity.this, Result.class);
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    intent.putExtra("userans", seriesOfAnsers);
+                                    intent.putExtra("serverAns", serverCorrectans);
+                                    intent.putExtra("test_id", para);
+                                    intent.putExtra("percentage", percentage);
+                                    intent.putExtra("savedResponse", responseStr);
+                                    getApplicationContext().startActivity(intent);
+                                }else
+                                {
+                                    Intent intent = new Intent(QuestionActivity.this, MainActivity.class);
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    getApplicationContext().startActivity(intent);
+                                }
                             }
                         });
                 builder1.setNegativeButton("No",
@@ -347,6 +408,9 @@ public class QuestionActivity extends ActionBarActivity {
 //            }
 //        });
 
+
+
+
 if(isReview == false) {
     radiobtn1 = (RadioButton) findViewById(R.id.option1RadioBox);
     radiobtn1.setOnClickListener(new View.OnClickListener() {
@@ -355,11 +419,16 @@ if(isReview == false) {
 
             AnswerModel[] aModel = qResposne[currentQuestion].getAnswerModel();
 
+
+
+            if (isPracticeMode==true)
             if (aModel[0].isCorrectFlag()) {
-                Toast.makeText(QuestionActivity.this, "correct Answer!!!", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(QuestionActivity.this, "correct Answer!!!", Toast.LENGTH_SHORT).show();
+                showAlert(true,"");
 
             } else {
-                Toast.makeText(QuestionActivity.this, "Wrong Answer!!!", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(QuestionActivity.this, "Wrong Answer!!!", Toast.LENGTH_SHORT).show();
+                showAlert(false,getCorrectAns());
             }
 
             checkRadioBtnStatus(1, currentQuestion);
@@ -374,11 +443,14 @@ if(isReview == false) {
 
             AnswerModel[] aModel = qResposne[currentQuestion].getAnswerModel();
 
+            if (isPracticeMode==true)
             if (aModel[1].isCorrectFlag()) {
-                Toast.makeText(QuestionActivity.this, "correct Answer!!!", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(QuestionActivity.this, "correct Answer!!!", Toast.LENGTH_SHORT).show();
+                showAlert(true,"");
 
             } else {
-                Toast.makeText(QuestionActivity.this, "Wrong Answer!!!", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(QuestionActivity.this, "Wrong Answer!!!", Toast.LENGTH_SHORT).show();
+                showAlert(false,getCorrectAns());
             }
 
             checkRadioBtnStatus(2, currentQuestion);
@@ -392,11 +464,14 @@ if(isReview == false) {
 
             AnswerModel[] aModel = qResposne[currentQuestion].getAnswerModel();
 
+            if (isPracticeMode==true)
             if (aModel[2].isCorrectFlag()) {
-                Toast.makeText(QuestionActivity.this, "correct Answer!!!", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(QuestionActivity.this, "correct Answer!!!", Toast.LENGTH_SHORT).show();
+                showAlert(true, "");
 
             } else {
-                Toast.makeText(QuestionActivity.this, "Wrong Answer!!!", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(QuestionActivity.this, "Wrong Answer!!!", Toast.LENGTH_SHORT).show();
+                showAlert(false, getCorrectAns());
             }
 
             checkRadioBtnStatus(3, currentQuestion);
@@ -411,11 +486,14 @@ if(isReview == false) {
 
             AnswerModel[] aModel = qResposne[currentQuestion].getAnswerModel();
 
+            if (isPracticeMode==true)
             if (aModel[3].isCorrectFlag()) {
-                Toast.makeText(QuestionActivity.this, "correct Answer!!!", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(QuestionActivity.this, "correct Answer!!!", Toast.LENGTH_SHORT).show();
+                showAlert(true, "");
 
             } else {
-                Toast.makeText(QuestionActivity.this, "Wrong Answer!!!", Toast.LENGTH_SHORT).show();
+               // Toast.makeText(QuestionActivity.this, "Wrong Answer!!!", Toast.LENGTH_SHORT).show();
+                showAlert(false, getCorrectAns());
             }
             checkRadioBtnStatus(4, currentQuestion);
 
@@ -451,6 +529,20 @@ if(isReview == false) {
 //        serverAns = ansList;
 //    }
 
+
+    public String getCorrectAns(){
+        String correct_Ans = null;
+        for(int i = 0 ; i<qResposne[currentQuestion].getAnswerModel().length ; i++)
+        {
+            AnswerModel[] aModel = qResposne[currentQuestion].getAnswerModel();
+            if(aModel[i].isCorrectFlag()==true)
+            {
+                correct_Ans = aModel[i].getAnsPrefix();
+            }
+        }
+
+        return correct_Ans;
+    }
 
     public QuestionModel[] parse(String jsonLine)
     {
@@ -531,7 +623,7 @@ if(isReview == false) {
        if(position < qResposne.length && position >= 0 )
         if(qResposne !=null) {
 
-            QuestionStatus.setText(" " + (position+1) +"/" + qResposne.length);
+            QuestionStatus.setText(" " + (position + 1) + "/" + qResposne.length);
 
             questiontext.setText(qResposne[position].getQuestionText());
             AnswerModel[] answerModel = qResposne[position].getAnswerModel();
@@ -672,7 +764,7 @@ if(isReview == false) {
 
         System.out.print("checkbox " + position);
 
-        Toast.makeText(this, "checkbox -> " + position, Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, "checkbox -> " + position, Toast.LENGTH_SHORT).show();
 
         if(position == 1)
         {
@@ -698,4 +790,48 @@ if(isReview == false) {
 
     }
 
+
+    public void showAlert(boolean isCorrect, String correctAns) {
+
+        if (isCorrect == true) {
+            AlertDialog.Builder builder1 = new AlertDialog.Builder(QuestionActivity.this);
+            builder1.setTitle("You are correct!!!");
+            builder1.setCancelable(true);
+            builder1.setPositiveButton("OK",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.cancel();
+                        }
+                    });
+
+            AlertDialog alert11 = builder1.create();
+            alert11.show();
+        }
+        else
+        {
+            AlertDialog.Builder builder1 = new AlertDialog.Builder(QuestionActivity.this);
+            builder1.setTitle("Wrong!!");
+            builder1.setMessage("Correct answer is "+correctAns );
+            builder1.setCancelable(true);
+            builder1.setPositiveButton("OK",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.cancel();
+                        }
+                    });
+
+            AlertDialog alert11 = builder1.create();
+            alert11.show();
+        }
+    }
+
+
+    @Override
+    public void onBackPressed()
+    {
+        super.onBackPressed();
+        startActivity(new Intent(QuestionActivity.this, MainActivity.class));
+        finish();
+
+    }
 }

@@ -40,12 +40,20 @@ public class MainActivity extends ActionBarActivity
      */
     private NavigationDrawerFragment mNavigationDrawerFragment;
     private Toolbar mToolbar;
+    private boolean isVideoTutorial = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("isVideoTutorial", false);
+        editor.commit();
+
+     //   getSupportActionBar().setIcon(R.mipmap.ic_launcher);
 
 //        //Get the Listview
 //        String [] technologies = {"C","C++","Java","Objective C","Swift","Android","Database","TomCat","Javascript","HTML","CSS","Ruby on Rails","Jenkins"  };
@@ -73,7 +81,7 @@ public class MainActivity extends ActionBarActivity
 
         //fill the listview
         RequestQueue queue = Volley.newRequestQueue(this);
-        String url ="http://testmyskills.herokuapp.com/api/v1/technologies.json?"+"auth_token=" + restoredAuth+"&"+ "email="+restoredEmail;
+        String url ="http://52.24.180.90/api/v1/technologies.json?"+"auth_token=" + restoredAuth+"&"+ "email="+restoredEmail;
 
 
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
@@ -85,7 +93,7 @@ public class MainActivity extends ActionBarActivity
                         progressBar.setVisibility(View.INVISIBLE);
                         System.out.println(response);
                         ListView listView = (ListView) findViewById(R.id.listView);
-                        CustomAdapter mAdapter = new CustomAdapter(MainActivity.this, parse(response));
+                        CustomAdapter mAdapter = new CustomAdapter(MainActivity.this, parse(response),isVideoTutorial);
                         listView.setAdapter(mAdapter);
 
                     }
@@ -134,10 +142,32 @@ public class MainActivity extends ActionBarActivity
         {
             Intent intent = new Intent(MainActivity.this, TestHistory.class);
             startActivity(intent);
-            finish();
+//            finish();
+
         }
 
-        if(position == 2){
+        if(position == 2)
+        {
+
+            isVideoTutorial = true;
+
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean("isVideoTutorial",true);
+            editor.commit();
+
+          /*  Intent intent = new Intent(MainActivity.this, videotutorial.class);
+            startActivity(intent);*/
+        }
+        else
+        {
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean("isVideoTutorial",false);
+            editor.commit();
+        }
+
+        if(position == 3){
             Intent mailer = new Intent(Intent.ACTION_SEND);
             mailer.setType("text/plain");
             mailer.putExtra(Intent.EXTRA_EMAIL, new String[]{"name@email.com"});

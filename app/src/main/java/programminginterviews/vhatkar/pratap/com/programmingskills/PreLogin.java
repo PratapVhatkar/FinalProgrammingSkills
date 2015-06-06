@@ -157,7 +157,7 @@ public class PreLogin extends Activity implements
 
             Intent intents = new Intent(PreLogin.this, MainActivity.class);
             startActivity(intents);
-            finish();
+//            finish();
 
         }
         else {
@@ -170,7 +170,7 @@ public class PreLogin extends Activity implements
 //to registration
                     Intent intent = new Intent(PreLogin.this, Registration.class);
                     startActivity(intent);
-                    finish();
+//                    finish();
                 }
             });
             try {
@@ -423,7 +423,7 @@ public class PreLogin extends Activity implements
                     }
 
                     RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-                    JsonObjectRequest jsObjRequest = new JsonObjectRequest(Request.Method.POST, "http://testmyskills.herokuapp.com/api/v1/sessions.json", js,
+                    JsonObjectRequest jsObjRequest = new JsonObjectRequest(Request.Method.POST, "http://52.24.180.90/api/v1/sessions.json", js,
                             new Response.Listener<JSONObject>() {
                                 @Override
                                 public void onResponse(JSONObject response) {
@@ -463,6 +463,7 @@ public class PreLogin extends Activity implements
                                         Intent intent = new Intent(PreLogin.this, MainActivity.class);
                                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                         getApplicationContext().startActivity(intent);
+                                        finish();
                                     } else {
 //                                    JsonObject userObject = jobject.getAsJsonObject("user").getAsJsonObject();
                                         String str = jobject.get("message").getAsString();
@@ -622,7 +623,7 @@ public class PreLogin extends Activity implements
 
 
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-        JsonObjectRequest jsObjRequest = new JsonObjectRequest(Request.Method.POST, "http://testmyskills.herokuapp.com/api/v1/registrations/social_registration.json", js,
+        JsonObjectRequest jsObjRequest = new JsonObjectRequest(Request.Method.POST, "http://52.24.180.90/api/v1/registrations/social_registration.json", js,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -702,6 +703,7 @@ public class PreLogin extends Activity implements
     public void onResult(People.LoadPeopleResult peopleData) {
         System.out.print(" People Data --->" + peopleData.toString());
     }
+
     public boolean onCreateOptionsMenu(Menu menu) {
 // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_pre_login, menu);
@@ -723,6 +725,7 @@ public class PreLogin extends Activity implements
     public void onConnectionSuspended(int i) {
         mGoogleApiClient.connect();
     }
+
     @Override
     public void onConnectionFailed(ConnectionResult result) {
         Log.i(TAG, "onConnectionFailed: ConnectionResult.getErrorCode() = "
@@ -806,6 +809,7 @@ public class PreLogin extends Activity implements
         startActivity(intent);
         finish();
     }
+
     protected void onActivityResult(int requestCode, int resultCode,
                                     Intent data) {
         switch (requestCode) {
@@ -830,6 +834,7 @@ public class PreLogin extends Activity implements
 //manage login result
         callbackManager.onActivityResult(requestCode, resultCode, data);
     }
+
     @Override
     public CheckResult onCheckServerAuthorization(String idToken, Set<Scope> scopeSet) {
         Log.i(TAG, "Checking if server is authorized.");
@@ -971,4 +976,6 @@ public class PreLogin extends Activity implements
         return true;
 
     }
+
+
 }

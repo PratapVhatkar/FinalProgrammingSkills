@@ -29,7 +29,7 @@
                 android:paddingRight="@dimen/activity_horizontal_margin"
                 android:paddingTop="@dimen/activity_vertical_margin"
                 android:paddingBottom="@dimen/activity_vertical_margin"
-                android:text="This will be a question ? What is sdfjh ? why aslkdjlk ?"
+                android:text=""
                 android:id="@+id/textQuestion"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:background="@color/faint_white"
@@ -140,7 +140,7 @@
                     android:layout_height="wrap_content"
                     android:id="@+id/option4Text"
                     android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="ajdhasdasd"
+                    android:text=""
                     android:paddingLeft="5dp"
                     android:layout_toRightOf="@+id/option4RadioBox"
                     />

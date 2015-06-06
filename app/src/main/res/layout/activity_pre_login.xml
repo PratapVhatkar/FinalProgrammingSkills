@@ -40,7 +40,7 @@
                 android:paddingRight="10dp"
                 android:paddingTop="10dp"
                 android:paddingBottom="10dp"
-                android:text="Username:"
+                android:text="Name:"
                 android:textColor="#FFFFFF"
                 />
 
@@ -53,6 +53,8 @@
                 android:paddingTop="10dp"
                 android:paddingBottom="10dp"
                 android:id="@+id/username"
+                android:password="false"
+                android:maxLines="1"
                 android:background="@drawable/rounded_corner"
                 />
 
@@ -64,7 +66,7 @@
                  android:paddingRight="10dp"
                  android:paddingTop="10dp"
                  android:paddingBottom="10dp"
-                 android:hint="Password:"
+                 android:text="Password:"
                  android:textColor="#FFFFFF"
                 />
 
@@ -78,7 +80,9 @@
                     android:paddingTop="10dp"
                     android:paddingBottom="10dp"
                     android:id="@+id/passwordtextfield"
-                   android:background="@drawable/rounded_corner"
+                    android:password="true"
+                    android:maxLines="1"
+                    android:background="@drawable/rounded_corner"
                 />
 
 

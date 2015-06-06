@@ -9,6 +9,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.RadioButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
@@ -32,13 +34,42 @@ import org.json.JSONObject;
 
 public class StartTestActivity extends ActionBarActivity {
 
+    private boolean isIntantAnswers = true;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start_test);
 
+
         Intent intent = getIntent();
         final int para = intent.getIntExtra("test_id", 0);
+        String tes = intent.getStringExtra("test_name");
+
+        TextView Testname = (TextView)findViewById(R.id.testName);
+        Testname.setText(tes.toUpperCase());
+
+
+        final RadioButton practiceModeTest = (RadioButton)findViewById(R.id.practiceRadioButton);
+        final RadioButton testRadioButton = (RadioButton)findViewById(R.id.testRadioButton);
+
+        practiceModeTest.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                isIntantAnswers = true;
+                testRadioButton.setChecked(false);
+                practiceModeTest.setChecked(true);
+            }
+        });
+
+        testRadioButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                isIntantAnswers = false;
+                testRadioButton.setChecked(true);
+                practiceModeTest.setChecked(false);
+            }
+        });
+
 
         final Button backBtn= (Button)findViewById(R.id.startId);
         final ProgressBarCircularIndeterminate progressBar = (ProgressBarCircularIndeterminate)findViewById(R.id.progressBarCircularIndeterminate);
@@ -68,7 +99,7 @@ public class StartTestActivity extends ActionBarActivity {
                 }
 
 
-                JsonObjectRequest jsObjRequest = new JsonObjectRequest(Request.Method.POST,"http://testmyskills.herokuapp.com/api/v1/users/create_my_test.json",jsonobject_one,
+                JsonObjectRequest jsObjRequest = new JsonObjectRequest(Request.Method.POST,"http://52.24.180.90/api/v1/users/create_my_test.json",jsonobject_one,
                         new Response.Listener<JSONObject>() {
                             @Override
                             public void onResponse(JSONObject response) {
@@ -78,6 +109,7 @@ public class StartTestActivity extends ActionBarActivity {
                                 Intent intent = new Intent(StartTestActivity.this, QuestionActivity.class);
                                 intent.putExtra("isReview",false);
                                 intent.putExtra("test_id",para);
+                                intent.putExtra("isPractice",isIntantAnswers);
                                 startActivity(intent);
                                 finish();
 

@@ -69,7 +69,7 @@ public class TestListActivity extends Activity implements BillingProcessor.IBill
         String restoredAuth = prefs.getString("auth", null);
         String restoredEmail = prefs.getString("email", null);
 
-        String url ="http://testmyskills.herokuapp.com/api/v1/tests.json?technology_id="+para+"&auth_token=" + restoredAuth+"&"+ "email="+restoredEmail;
+        String url ="http://52.24.180.90/api/v1/tests.json?technology_id="+para+"&auth_token=" + restoredAuth+"&"+ "email="+restoredEmail;
 
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
@@ -130,14 +130,16 @@ public class TestListActivity extends Activity implements BillingProcessor.IBill
             JsonObject temp = jarray.get(i).getAsJsonObject();
             String testName = temp.get("name").getAsString();
             int test_id = temp.get("id").getAsInt();
-
+            int questionattempt = temp.get("total_questions").getAsInt();
+            int user_attempt = temp.get("users_attempted").getAsInt();
+            boolean isPurchased = temp.get("is_purchased_by_user").getAsBoolean();
 
             int user_id = 0;//temp.get("user_id").getAsInt();
             boolean isPaid = temp.get("is_paid").getAsBoolean();
             String price = temp.get("price").getAsString();
             int techId = temp.get("technology_id").getAsInt();
 
-            TestListModel model = new TestListModel(testName,test_id,user_id,isPaid,price,techId);
+            TestListModel model = new TestListModel(testName,test_id,user_id,isPaid,price,techId,questionattempt,user_attempt,isPurchased);
             array[i] = model;
         }
 
@@ -195,6 +197,7 @@ public class TestListActivity extends Activity implements BillingProcessor.IBill
     @Override
     public void onProductPurchased(String s, TransactionDetails transactionDetails) {
 
+        System.out.print("Transaction details-->" +transactionDetails + "some string" + s  );
     }
 
     @Override

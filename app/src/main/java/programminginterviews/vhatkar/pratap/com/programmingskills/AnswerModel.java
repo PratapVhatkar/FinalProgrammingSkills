@@ -39,11 +39,11 @@ public class AnswerModel {
 
     public String getAnsPrefix()
     {
-        return this.getAnsPrefix();
+        return this.ansPrefix;
     }
 
     public int getQueId()
     {
-        return this.getQueId();
+        return this.queId;
     }
 }

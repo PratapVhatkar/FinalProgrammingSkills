@@ -60,9 +60,36 @@ public class CustomTestListAdapter extends BaseAdapter {
         TextView tv1 = (TextView) convertView
                 .findViewById(R.id.testName);
 
-        tv1.setText(this.mainList[position].getName());
 
+
+        tv1.setText(this.mainList[position].getName());
         ButtonFlat buyTest = (ButtonFlat) convertView.findViewById(R.id.byeBtn);
+
+        if(this.mainList[position].isPaid())
+        {
+            if(this.mainList[position].Is_user_purchased())
+            {
+                buyTest.setText("Purchased");
+            }
+            else
+            {
+                buyTest.setText("Buy");
+            }
+        }
+        else
+        {
+            buyTest.setText("Free");
+        }
+
+
+
+        TextView tv2 = (TextView)convertView.findViewById(R.id.totalQuestion);
+        tv2.setText("Total " + this.mainList[position].getQuestionAttept() +  " question");
+
+
+        TextView tv3 = (TextView)convertView.findViewById(R.id.totalAppear);
+        tv3.setText(this.mainList[position].getUserAttempt() +  " users have given this test");
+
 
         buyTest.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -79,14 +106,26 @@ public class CustomTestListAdapter extends BaseAdapter {
                 public void onClick(View v) {
 
                     if(mainList[position].isPaid()){
+
+                        if(!mainList[position].Is_user_purchased())
+                        {
+                            ((TestListActivity) appContext).onBuyPressed();
+                        }
+                        else {
+                            TestListModel model = mainList[position];
+                            Intent intent = new Intent(appContext, StartTestActivity.class);
+                            intent.putExtra("test_id",mainList[position].getTestid());
+                            intent.putExtra("test_name",mainList[position].getName());
+                            appContext.startActivity(intent);
+                        }
                         //show paypal
-                        ((TestListActivity) appContext).onBuyPressed();
                     }
                     else {
 
                         TestListModel model = mainList[position];
                         Intent intent = new Intent(appContext, StartTestActivity.class);
                         intent.putExtra("test_id",mainList[position].getTestid());
+                        intent.putExtra("test_name",mainList[position].getName());
                         appContext.startActivity(intent);
                     }
 

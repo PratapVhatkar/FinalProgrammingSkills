@@ -48,14 +48,20 @@ public class Result extends ActionBarActivity {
         serverAns = intent.getIntegerArrayListExtra("serverAns");
         testid =  intent.getIntExtra("test_id", 0);
 
-        int percen = intent.getIntExtra("percentage",0);
+        final String modelString = intent.getStringExtra("savedResponse");
 
+        int percen = intent.getIntExtra("percentage",0);
         TextView score = (TextView)findViewById(R.id.percentageLabel);
         score.setText(calculateResult(userAns,serverAns)+"%");
 
 
-
-
+        ButtonFlat home = (ButtonFlat)findViewById(R.id.toHome);
+        home.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(intent);
+            }
+        });
 
 
         //Review Test
@@ -69,16 +75,12 @@ public class Result extends ActionBarActivity {
                 intent.putExtra("serverAns",serverAns);
                 intent.putExtra("userans",userAns);
                 intent.putExtra("isReview",true);
+                intent.putExtra("savedResponse",modelString);
                 startActivity(intent);
             }
         });
 
-
         SendResult(calculateResult(userAns,serverAns),testid);
-
-
-
-
     }
 
     public void SendResult(int percentage,int id )
@@ -107,7 +109,7 @@ public class Result extends ActionBarActivity {
         }
 
 
-        JsonObjectRequest jsObjRequest = new JsonObjectRequest(Request.Method.POST,"http://testmyskills.herokuapp.com/api/v1/users/save_test_results.json",jsonobject_one,
+        JsonObjectRequest jsObjRequest = new JsonObjectRequest(Request.Method.POST,"http://52.24.180.90/api/v1/users/save_test_results.json",jsonobject_one,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {

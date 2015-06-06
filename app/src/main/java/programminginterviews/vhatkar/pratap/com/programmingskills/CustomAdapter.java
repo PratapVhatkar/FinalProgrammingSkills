@@ -2,8 +2,10 @@ package programminginterviews.vhatkar.pratap.com.programmingskills;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
+import android.preference.PreferenceManager;
 import android.util.LruCache;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,15 +32,20 @@ public class CustomAdapter extends BaseAdapter {
     private RequestQueue mRequestQueue;
     private ImageLoader mImageLoader;
 
-    public CustomAdapter(Context applicationContext,TechnologiesModel[] itemList) {
+    private boolean isVideoTutorial;
+
+    public CustomAdapter(Context applicationContext,TechnologiesModel[] itemList, boolean isTut) {
         super();
         this.mainList = itemList;
         this.appContext = applicationContext;
+        this.isVideoTutorial = isTut;
     }
 
-    public CustomAdapter() {
+    public CustomAdapter(MainActivity mainActivity, TechnologiesModel[] parse, boolean isVideoTutorial) {
         super();
-        this.mainList = mainList;
+        this.mainList = parse;
+        this.appContext = mainActivity;
+        this.isVideoTutorial = isVideoTutorial;
     }
 
 
@@ -59,6 +66,11 @@ public class CustomAdapter extends BaseAdapter {
         return position;
     }
 
+
+    public boolean IsVideoTutorial()
+    {
+        return this.isVideoTutorial;
+    }
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
@@ -119,10 +131,24 @@ public class CustomAdapter extends BaseAdapter {
                 @Override
                 public void onClick(View v) {
 
-                    TechnologiesModel model = mainList[position];
-                    Intent intent = new Intent(appContext, TestListActivity.class);
-                    intent.putExtra("techid",model.getTechnologyID());
-                    appContext.startActivity(intent);
+                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(appContext);
+                    boolean isVideo = prefs.getBoolean("isVideoTutorial", false);
+
+
+                    if(isVideo == true){
+
+                        TechnologiesModel model = mainList[position];
+                        Intent intent = new Intent(appContext, videotutorial.class);
+                        intent.putExtra("techid", model.getTechnologyID());
+                        appContext.startActivity(intent);
+                    }
+                    else {
+
+                        TechnologiesModel model = mainList[position];
+                        Intent intent = new Intent(appContext, TestListActivity.class);
+                        intent.putExtra("techid", model.getTechnologyID());
+                        appContext.startActivity(intent);
+                    }
                 }
 
             });

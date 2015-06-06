@@ -9,13 +9,14 @@
    <LinearLayout
        android:layout_width="match_parent"
        android:layout_height="match_parent"
+       android:paddingTop="100dp"
        android:orientation="vertical"
        >
 
        <TextView
            android:layout_width="wrap_content"
            android:layout_height="wrap_content"
-           android:text=" Advanced C++ Test 1 "
+           android:text=" ADVANCED C++ TEST 1"
            android:textAppearance="?android:attr/textAppearanceLarge"
            android:textSize="30dp"
            android:textColor="@color/myPrimaryColor"
@@ -29,26 +30,30 @@
            android:paddingTop="30dp">
 
 
-           <TextView
-               android:layout_width="wrap_content"
-               android:layout_height="wrap_content"
-               android:text=" Please select the mode of test :- "
-               android:textAppearance="?android:attr/textAppearanceLarge"
-               android:textSize="20dp"
-               android:paddingLeft="0dp"
-               android:id="@+id/testMode"
-                />
+           <!--<TextView-->
+               <!--android:layout_width="wrap_content"-->
+               <!--android:layout_height="wrap_content"-->
+               <!--android:text=" Please select the mode of test"-->
+               <!--android:textAppearance="?android:attr/textAppearanceLarge"-->
+               <!--android:textSize="20dp"-->
+               <!--android:paddingLeft="0dp"-->
+               <!--android:id="@+id/testMode"-->
+                <!--/>-->
 
 
            <LinearLayout
                android:layout_width="wrap_content"
                android:layout_height="match_parent"
                android:paddingTop="30dp"
+               android:paddingLeft="30dp"
                >
 
            <RadioButton
                android:layout_width="wrap_content"
-               android:layout_height="match_parent"/>
+               android:layout_height="match_parent"
+               android:id="@+id/practiceRadioButton"
+               android:checked="true"
+               />
 
            <TextView
                android:layout_width="wrap_content"
@@ -67,11 +72,16 @@
            <LinearLayout
                android:layout_width="wrap_content"
                android:layout_height="match_parent"
-               android:paddingTop="30dp">
+               android:paddingTop="30dp"
+               android:paddingLeft="30dp"
+               >
 
            <RadioButton
                android:layout_width="wrap_content"
-               android:layout_height="match_parent"/>
+               android:layout_height="match_parent"
+               android:id="@+id/testRadioButton"
+               android:checked="false"
+               />
 
            <TextView
                android:layout_width="wrap_content"
@@ -100,7 +110,7 @@
     <com.gc.materialdesign.views.ButtonRectangle
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text = "Sart"
+        android:text = "START"
         android:id="@+id/startId"
         android:background="@color/myPrimaryColor"
         android:layout_alignParentBottom="true"

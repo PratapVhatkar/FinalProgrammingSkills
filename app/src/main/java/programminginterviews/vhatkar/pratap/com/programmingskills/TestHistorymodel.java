@@ -14,11 +14,12 @@ public class TestHistorymodel {
     private int totalQuestion;
     private int userAttempt;
     private  String score;
+    private String date;
 
 
     //
 
-    TestHistorymodel(String myTest_name,int myTest_id,int myUserid,boolean Paid,String myPrice, int mytechnologyId,int attempt,int questioncount,String sco)
+    TestHistorymodel(String myTest_name,int myTest_id,int myUserid,boolean Paid,String myPrice, int mytechnologyId,int attempt,int questioncount,String sco,String dat)
         {
             this.testid = myTest_id;
             this.technologyId = mytechnologyId;
@@ -29,7 +30,10 @@ public class TestHistorymodel {
             this.userAttempt = attempt;
             this.totalQuestion = questioncount;
             this.score = sco;
+            this.date = dat;
         }
+
+        public String getDate(){return  this.date;}
 
         public int getTotalQuestion(){return  this.totalQuestion;}
 

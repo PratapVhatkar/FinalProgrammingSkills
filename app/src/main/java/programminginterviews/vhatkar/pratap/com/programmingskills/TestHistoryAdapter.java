@@ -73,6 +73,9 @@ public class TestHistoryAdapter extends BaseAdapter {
         TextView score = (TextView)convertView.findViewById(R.id.scoreTextview);
         score.setText(this.mainList[position].getScore() + "%");
 
+        TextView date = (TextView)convertView.findViewById(R.id.date);
+        date.setText(this.mainList[position].getDate().toUpperCase());
+
 
         try {
             convertView.setOnClickListener(new View.OnClickListener() {
@@ -81,6 +84,7 @@ public class TestHistoryAdapter extends BaseAdapter {
                 public void onClick(View v) {
                         Intent intent = new Intent(appContext, StartTestActivity.class);
                         intent.putExtra("test_id",mainList[position].getTestid());
+                        intent.putExtra("test_name",mainList[position].getName());
                         appContext.startActivity(intent);
                     }
 
