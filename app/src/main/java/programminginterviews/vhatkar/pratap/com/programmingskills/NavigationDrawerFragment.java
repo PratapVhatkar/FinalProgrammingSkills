@@ -118,7 +118,7 @@ public class NavigationDrawerFragment extends Fragment implements NavigationDraw
 
     public List<NavigationItem> getMenu() {
         List<NavigationItem> items = new ArrayList<NavigationItem>();
-        items.add(new NavigationItem("My Tests", getResources().getDrawable(R.mipmap.home)));
+        items.add(new NavigationItem("Home", getResources().getDrawable(R.mipmap.home)));
         items.add(new NavigationItem("My Results", getResources().getDrawable(R.mipmap.history)));
         items.add(new NavigationItem("Video Tutorial", getResources().getDrawable(R.mipmap.video)));
         items.add(new NavigationItem("Feedback", getResources().getDrawable(R.mipmap.feedback)));

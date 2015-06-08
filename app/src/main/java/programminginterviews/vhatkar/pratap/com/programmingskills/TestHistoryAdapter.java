@@ -77,6 +77,10 @@ public class TestHistoryAdapter extends BaseAdapter {
         date.setText(this.mainList[position].getDate().toUpperCase());
 
 
+        TextView test_mode = (TextView)convertView.findViewById(R.id.testmode);
+        test_mode.setText("Test mode : " + this.mainList[position].getTest_mode().toUpperCase());
+
+
         try {
             convertView.setOnClickListener(new View.OnClickListener() {
 

@@ -44,6 +44,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/scrollview"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:paddingBottom="40dp"
             android:scrollbars="none">
 
             <LinearLayout
@@ -178,58 +181,61 @@
                         android:layout_toRightOf="@+id/option4RadioBox"
                         />
                 </LinearLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="50dp"
+                    />
+
+
             </LinearLayout>
+
+
         </com.gc.materialdesign.views.ScrollView>
 
 </LinearLayout>
 
+    <com.gc.materialdesign.views.ButtonFlat
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Back"
+    android:id="@+id/backBtn"
+    android:padding="15dp"
+    android:layout_above="@+id/adView"
+    android:layout_alignParentLeft="true"
+    />
 
 
-    <!--<RelativeLayout-->
-        <!--android:layout_width="match_parent"-->
+
+    <!--<Button-->
+        <!--android:layout_width="wrap_content"-->
         <!--android:layout_height="wrap_content"-->
-        <!--android:id="@+id/bottombtns"-->
-        <!-->-->
+        <!--android:text="Back"-->
+        <!--android:id="@+id/backBtn"-->
+        <!--android:padding="15dp"-->
+        <!--android:layout_above="@+id/adView"-->
+        <!--android:layout_alignParentLeft="true"-->
+        <!--/>-->
+    <com.gc.materialdesign.views.ButtonFlat
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Next"
+        android:id="@+id/nextBtn"
+        android:focusable="false"
+        android:padding="15dp"
+        android:layout_above="@+id/adView"
+        android:layout_alignParentRight="true"
+        />
 
-
-
-
-
-   <RelativeLayout
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content">
-
-
-        <com.gc.materialdesign.views.ButtonFlat
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingTop="20dp"
-            android:paddingRight="40dp"
-            android:paddingLeft="40dp"
-            android:paddingBottom="20dp"
-            android:text="Back"
-            android:id="@+id/backBtn"
-            android:padding="15dp"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentBottom="true"
-            />
-        <com.gc.materialdesign.views.ButtonFlat
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingTop="20dp"
-            android:paddingRight="40dp"
-            android:paddingLeft="40dp"
-            android:paddingBottom="20dp"
-            android:text="Next"
-            android:id="@+id/nextBtn"
-            android:focusable="false"
-            android:padding="15dp"
-            android:layout_alignTop="@+id/backBtn"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentBottom="true"
-             />
-
-   </RelativeLayout>
-
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/adView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        ads:adSize="BANNER"
+        ads:adUnitId="@string/banner_ad_unit_id">
+    </com.google.android.gms.ads.AdView>
 
 </RelativeLayout>

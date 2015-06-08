@@ -91,8 +91,17 @@ public class StartTestActivity extends ActionBarActivity {
                 JSONObject jsonobject_one = new JSONObject();
                 try {
                     jsonobject_one.put("email", restoredEmail);
-                    jsonobject_one.put("auth_token",restoredAuth);
-                    jsonobject_one.put("test_id",para);
+                    jsonobject_one.put("auth_token", restoredAuth);
+                    jsonobject_one.put("test_id", para);
+
+                    if (isIntantAnswers == true)
+                    {
+                        jsonobject_one.put("test_mode","practice");
+                    }
+                    else
+                    {
+                        jsonobject_one.put("test_mode","exam");
+                    }
 
                 } catch (JSONException e) {
                     e.printStackTrace();

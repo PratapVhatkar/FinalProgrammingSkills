@@ -157,6 +157,7 @@ public class PreLogin extends Activity implements
 
             Intent intents = new Intent(PreLogin.this, MainActivity.class);
             startActivity(intents);
+            finish();
 //            finish();
 
         }
@@ -637,6 +638,7 @@ public class PreLogin extends Activity implements
                         Intent intent1 = new Intent(PreLogin.this, MainActivity.class);
                         intent1.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         getApplicationContext().startActivity(intent1);
+                        finish();
 
                         boolean flag = false;
                         try {
@@ -669,6 +671,7 @@ public class PreLogin extends Activity implements
                             Intent intent = new Intent(PreLogin.this, MainActivity.class);
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             getApplicationContext().startActivity(intent);
+                            finish();
 
                             Toast.makeText(PreLogin.this,userObject.toString() , Toast.LENGTH_SHORT).show();
 

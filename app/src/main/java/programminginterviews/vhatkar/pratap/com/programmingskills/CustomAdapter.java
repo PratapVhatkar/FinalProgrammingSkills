@@ -92,9 +92,9 @@ public class CustomAdapter extends BaseAdapter {
 //        tv1.setTypeface(type);
 //        tv2.setTypeface(type);
 
+
         tv1.setText(this.mainList[position].getTechnologyName());
         tv2.setText(this.mainList[position].getGetTechnologyDescription());
-
 
 //        mRequestQueue = Volley.newRequestQueue(appContext);
 //        mImageLoader = new ImageLoader(mRequestQueue, new ImageLoader.ImageCache() {
@@ -109,6 +109,8 @@ public class CustomAdapter extends BaseAdapter {
 //
 //        NetworkImageView avatar = (NetworkImageView)convertView.findViewById(R.id.tech_image);
 //        avatar.setImageUrl(this.mainList[position].getIconurl(),mImageLoader);
+
+        String url = this.mainList[position].getIconurl();
 
         //Initialize ImageView
         ImageView imageView = (ImageView) convertView.findViewById(R.id.tech_image);

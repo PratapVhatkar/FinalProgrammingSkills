@@ -14,10 +14,12 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.anjlab.android.iab.v3.BillingProcessor;
@@ -34,6 +36,7 @@ import com.paypal.android.sdk.payments.PaymentActivity;
 import com.paypal.android.sdk.payments.PaymentConfirmation;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -51,12 +54,15 @@ public class TestListActivity extends Activity implements BillingProcessor.IBill
 
 
     private BillingProcessor bp;
+    private int test_ID;
+    private String testname;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test_list);
 
+        setTitle("Test");
 
         bp = new BillingProcessor(TestListActivity.this, getString(R.string.in_app_billing_key)  ,TestListActivity.this);
 
@@ -133,20 +139,28 @@ public class TestListActivity extends Activity implements BillingProcessor.IBill
             int questionattempt = temp.get("total_questions").getAsInt();
             int user_attempt = temp.get("users_attempted").getAsInt();
             boolean isPurchased = temp.get("is_purchased_by_user").getAsBoolean();
+            boolean isPaid = temp.get("is_paid").getAsBoolean();
+
+            String productString = "";
+            if(isPaid)
+            {
+                productString = temp.get("purchase_string").getAsString();
+            }
 
             int user_id = 0;//temp.get("user_id").getAsInt();
-            boolean isPaid = temp.get("is_paid").getAsBoolean();
+
             String price = temp.get("price").getAsString();
             int techId = temp.get("technology_id").getAsInt();
 
-            TestListModel model = new TestListModel(testName,test_id,user_id,isPaid,price,techId,questionattempt,user_attempt,isPurchased);
+
+            TestListModel model = new TestListModel(testName,test_id,user_id,isPaid,price,techId,questionattempt,user_attempt,isPurchased,productString);
             array[i] = model;
         }
 
         return array;
     }
 
-    public void onBuyPressed() {
+    public void onBuyPressed(String productIdntifier, int testID, String testName) {
 
         // PAYMENT_INTENT_SALE will cause the payment to complete immediately.
         // Change PAYMENT_INTENT_SALE to
@@ -166,8 +180,14 @@ public class TestListActivity extends Activity implements BillingProcessor.IBill
 //
 //        startActivityForResult(intent, 0);
 
-        bp.purchase(TestListActivity.this, "android.test.purchased");
-        bp.consumePurchase("android.test.purchased");
+
+        testname = testName;
+        test_ID = testID;
+        purchaseCompelete(testID);
+
+        bp.purchase(TestListActivity.this, productIdntifier);
+        bp.consumePurchase(productIdntifier);
+
     }
 
 
@@ -198,20 +218,151 @@ public class TestListActivity extends Activity implements BillingProcessor.IBill
     public void onProductPurchased(String s, TransactionDetails transactionDetails) {
 
         System.out.print("Transaction details-->" +transactionDetails + "some string" + s  );
+
+        /*
+        *   public final String productId;
+            public final String orderId;
+            public final String purchaseToken;
+            public final Date purchaseTime;
+            public final PurchaseInfo purchaseInfo;
+
+        * */
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        String restoredAuth = prefs.getString("auth", null);
+        String restoredEmail = prefs.getString("email", null);
+
+
+
+        JSONObject js = new JSONObject();
+        try {
+            JSONObject innerObject = new JSONObject();
+            innerObject.put("product_id", transactionDetails.productId.toString());
+            innerObject.put("order_id", transactionDetails.orderId.toString());
+            innerObject.put("purchase_token", transactionDetails.purchaseToken.toString());
+            innerObject.put("purchase_time", transactionDetails.purchaseTime.toString());
+            innerObject.put("purchase_info", transactionDetails.purchaseInfo.toString());
+            innerObject.put("test_id",test_ID);
+            js.put("order",innerObject);
+            js.put("email",restoredEmail);
+            js.put("auth",restoredAuth);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+        JsonObjectRequest jsObjRequest = new JsonObjectRequest(Request.Method.POST, "http://52.24.180.90/api/v1/orders.json", js,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        System.out.println(response);
+
+                        Toast.makeText(TestListActivity.this, " Payment Sucessfull!!" + response.toString(), Toast.LENGTH_LONG).show();
+
+                        Intent intent = new Intent(getApplicationContext(), StartTestActivity.class);
+                        intent.putExtra("test_id", test_ID);
+                        intent.putExtra("test_name",testname);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        getApplicationContext().startActivity(intent);
+
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(TestListActivity.this, "Error ->" + error.toString(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+        jsObjRequest.setRetryPolicy(new DefaultRetryPolicy(5000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+
+        queue.add(jsObjRequest);
+
+
+    }
+
+    public void purchaseCompelete(int testID)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        String restoredAuth = prefs.getString("auth", null);
+        String restoredEmail = prefs.getString("email", null);
+
+
+
+        JSONObject js = new JSONObject();
+        try {
+            JSONObject innerObject = new JSONObject();
+
+            innerObject.put("product_id", "test");
+            innerObject.put("order_id", "1");
+            innerObject.put("purchase_token", "purchasetoken");
+            innerObject.put("purchase_time", "time");
+            innerObject.put("Purchase_info", "info");
+            innerObject.put("test_id",testID);
+            js.put("order",innerObject);
+            js.put("email",restoredEmail);
+            js.put("auth_token",restoredAuth);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+        JsonObjectRequest jsObjRequest = new JsonObjectRequest(Request.Method.POST, "http://52.24.180.90/api/v1/orders.json", js,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        System.out.println(response);
+
+                        Toast.makeText(TestListActivity.this, " Payment Sucessfull!!" + response.toString(), Toast.LENGTH_LONG).show();
+                        Intent intent = new Intent(getApplicationContext(), StartTestActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        intent.putExtra("test_id",test_ID);
+                        intent.putExtra("test_name", testname);
+                        getApplicationContext().startActivity(intent);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(TestListActivity.this, "Error ->" + error.toString(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+        jsObjRequest.setRetryPolicy(new DefaultRetryPolicy(5000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+
+        queue.add(jsObjRequest);
     }
 
     @Override
     public void onPurchaseHistoryRestored() {
-
+        System.out.print("Purchase restored");
     }
 
     @Override
     public void onBillingError(int i, Throwable throwable) {
 
+        //System.out.print(throwable.toString());
     }
 
     @Override
     public void onBillingInitialized() {
 
     }
+
+    /*
+    {
+    "packageName": "programminginterviews.vhatkar.pratap.com.programmingskills",
+    "orderId": "transactionId.android.test.purchased",
+    "productId": "android.test.purchased",
+    "developerPayload": "inapp:9788f19d-3ca9-4350-a782-3455aa48bb31",
+    "purchaseTime": 0,
+    "purchaseState": 0,
+    "purchaseToken": "inapp:programminginterviews.vhatkar.pratap.com.programmingskills:android.test.purchased"
+}*/
 }

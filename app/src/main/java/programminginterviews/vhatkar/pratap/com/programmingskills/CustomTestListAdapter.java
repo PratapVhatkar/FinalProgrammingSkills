@@ -95,7 +95,7 @@ public class CustomTestListAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
 
-                ((TestListActivity) appContext).onBuyPressed();
+                ((TestListActivity) appContext).onBuyPressed(mainList[position].getProductString(), mainList[position].getTestid(),mainList[position].getName());
             }
         });
 
@@ -109,7 +109,7 @@ public class CustomTestListAdapter extends BaseAdapter {
 
                         if(!mainList[position].Is_user_purchased())
                         {
-                            ((TestListActivity) appContext).onBuyPressed();
+                            ((TestListActivity) appContext).onBuyPressed(mainList[position].getProductString(), mainList[position].getTestid(), mainList[position].getName() );;
                         }
                         else {
                             TestListModel model = mainList[position];

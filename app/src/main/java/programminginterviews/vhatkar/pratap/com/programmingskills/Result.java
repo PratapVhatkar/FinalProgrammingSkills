@@ -34,6 +34,7 @@ public class Result extends ActionBarActivity {
     ArrayList<Integer> userAns = new ArrayList<Integer>();
 
     private  int testid;
+    private boolean isIntantAnswers;
     TextView textStatus;
 
     @Override
@@ -47,7 +48,7 @@ public class Result extends ActionBarActivity {
         userAns = intent.getIntegerArrayListExtra("userans");
         serverAns = intent.getIntegerArrayListExtra("serverAns");
         testid =  intent.getIntExtra("test_id", 0);
-
+        isIntantAnswers = intent.getBooleanExtra("isInstant",true);
         final String modelString = intent.getStringExtra("savedResponse");
 
         int percen = intent.getIntExtra("percentage",0);
@@ -102,6 +103,15 @@ public class Result extends ActionBarActivity {
             jsonobject_one.put("test_id",id);
             jsonobject_one.put("score",percentage);
             jsonobject_one.put("completed",true);
+
+            if (isIntantAnswers == true)
+            {
+                jsonobject_one.put("test_mode","practice");
+            }
+            else
+            {
+                jsonobject_one.put("test_mode","exam");
+            }
             //  { auth_token: user.auth_token, email: user.email, test_id: 2, score: 83, result: 'Passed', completed: true }
 
         } catch (JSONException e) {

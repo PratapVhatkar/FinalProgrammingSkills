@@ -15,11 +15,12 @@ public class TestHistorymodel {
     private int userAttempt;
     private  String score;
     private String date;
+    private String test_mode;
 
 
     //
 
-    TestHistorymodel(String myTest_name,int myTest_id,int myUserid,boolean Paid,String myPrice, int mytechnologyId,int attempt,int questioncount,String sco,String dat)
+    TestHistorymodel(String myTest_name,int myTest_id,int myUserid,boolean Paid,String myPrice, int mytechnologyId,int attempt,int questioncount,String sco,String dat, String tmode)
         {
             this.testid = myTest_id;
             this.technologyId = mytechnologyId;
@@ -31,7 +32,10 @@ public class TestHistorymodel {
             this.totalQuestion = questioncount;
             this.score = sco;
             this.date = dat;
+            this.test_mode = tmode;
         }
+    
+        public String getTest_mode(){return  this.test_mode;}
 
         public String getDate(){return  this.date;}
 

@@ -91,8 +91,9 @@ public class TestHistory extends ActionBarActivity {
             String price = temp.get("price").getAsString();
             int techId = temp.get("technology_id").getAsInt();
             int questionattempt = temp.get("total_questions").getAsInt();
-            String date = temp.get("created_at").getAsString();
+            String date = temp.get("updated_at").getAsString();
 
+            String test_mode = "";
             int user_attempt = temp.get("users_attempted").getAsInt();
             String score = "";
             if(!temp.get("test_result").isJsonNull()) {
@@ -104,9 +105,12 @@ public class TestHistory extends ActionBarActivity {
                 else {
                     score = "Incomplete";
                 }
+
+                test_mode = test_result.get("test_mode").getAsString();
+
             }
 
-            TestHistorymodel model = new TestHistorymodel(testName,test_id,user_id,isPaid,price,techId,user_attempt,questionattempt,score,date);
+            TestHistorymodel model = new TestHistorymodel(testName,test_id,user_id,isPaid,price,techId,user_attempt,questionattempt,score,date,test_mode);
             array[i] = model;
         }
 

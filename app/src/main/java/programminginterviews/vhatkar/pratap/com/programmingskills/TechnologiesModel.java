@@ -18,7 +18,7 @@ public class TechnologiesModel {
         this.technologyName = name;
         this.technologyID = id;
         this.getTechnologyDescription = description;
-        this.iconurl = "http://testmyskills.herokuapp.com/" + iconname;
+        this.iconurl = "http://52.24.180.90" + iconname;
     }
 
 

@@ -74,8 +74,8 @@ public class videoAdapter extends BaseAdapter {
 
         Picasso.with(appContext)
                 .load(this.mainList[position].getThumbnailurl())
-                .placeholder(R.mipmap.ic_launcher)   // optional
-                .error(R.mipmap.ic_launcher)      // optional
+                .placeholder(R.drawable.oldtv)   // optional
+                .error(R.drawable.oldtv)      // optional
                         // optional
                 .rotate(0)                             // optional
                 .into(imageView);

@@ -32,6 +32,10 @@ import com.android.volley.toolbox.Volley;
 import com.gc.materialdesign.views.Button;
 import com.gc.materialdesign.views.ButtonFlat;
 import com.gc.materialdesign.widgets.Dialog;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -56,6 +60,7 @@ public class QuestionActivity extends ActionBarActivity {
 
     private ButtonFlat backBtn;
     private ButtonFlat nextBtn;
+
     private ButtonFlat endTest;
     private ButtonFlat submitButton;
     private QuestionModel[] resultsScreenAns;
@@ -91,6 +96,8 @@ public class QuestionActivity extends ActionBarActivity {
 
     private ButtonFlat QuestionStatus;
 
+    InterstitialAd mInterstitialAd;
+
     private boolean isReview =false;
     private LinearLayout rl1;
     private LinearLayout rl2;
@@ -105,6 +112,21 @@ public class QuestionActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_question);
 
+        AdView mAdView = (AdView) findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
+
+
+        mInterstitialAd = new InterstitialAd(this);
+        mInterstitialAd.setAdUnitId(String.valueOf(R.string.full_screen_ads));
+        requestNewInterstitial();
+
+        mInterstitialAd.setAdListener(new AdListener() {
+            @Override
+            public void onAdClosed() {
+                requestNewInterstitial();
+            }
+        });
 
         //New
 
@@ -131,10 +153,14 @@ public class QuestionActivity extends ActionBarActivity {
 
         //Backbtn
         endTest = (ButtonFlat) findViewById(R.id.btnEndtest);
+
         backBtn = (ButtonFlat) findViewById(R.id.backBtn);
         nextBtn = (ButtonFlat) findViewById(R.id.nextBtn);
         resultsScreenAns = null;
         userAnsList = null;
+
+//        nextBtn.setBackgroundResource(R.mipmap.next_arrow);
+//        backBtn.setBackgroundResource(R.mipmap.back_arrow);
 
 //        listview = (HorizontialListView) findViewById(R.id.listview);
 //        listview.setScrollContainer(false);
@@ -374,6 +400,12 @@ public class QuestionActivity extends ActionBarActivity {
                                     intent.putExtra("test_id", para);
                                     intent.putExtra("percentage", percentage);
                                     intent.putExtra("savedResponse", responseStr);
+
+                                    if(isPracticeMode==true)
+                                    intent.putExtra("isInstant",true);
+                                    else
+                                    intent.putExtra("isInstant",false);
+
                                     getApplicationContext().startActivity(intent);
                                 }else
                                 {
@@ -610,6 +642,12 @@ if(isReview == false) {
     public void fillnext(int position)
     {
 
+        if(position%3==0)
+        {
+            mInterstitialAd.show();
+            requestNewInterstitial();
+        }
+
         radiobtn1.setChecked(false);
         radiobtn2.setChecked(false);
         radiobtn3.setChecked(false);
@@ -834,4 +872,11 @@ if(isReview == false) {
         finish();
 
     }
+
+
+    private void requestNewInterstitial() {
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mInterstitialAd.loadAd(adRequest);
+    }
+
 }
